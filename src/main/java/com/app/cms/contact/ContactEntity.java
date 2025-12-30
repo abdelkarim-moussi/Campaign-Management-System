@@ -24,4 +24,6 @@ public class ContactEntity {
     private String phone;
     private String company;
     private LocalDate createdAt;
+    private ContactStatus status;
+
 }
