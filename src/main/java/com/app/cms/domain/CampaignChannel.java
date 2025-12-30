@@ -1,21 +1,20 @@
-package com.app.cms.campaignmanagementsystem.template;
+package com.app.cms.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "templates")
+@Table(name = "campaign_channels")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TemplateEntity {
+public class CampaignChannel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String name;
-    private String subject;
-    private TemplateType templateType;
+    private CampaignChannelType channelType;
+    private boolean enabled;
 }

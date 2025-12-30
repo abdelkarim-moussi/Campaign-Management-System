@@ -1,21 +1,20 @@
-package com.app.cms.campaignmanagementsystem.automation;
+package com.app.cms.automation;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "workflows")
+@Table(name = "workflow_actions")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WorkflowEntity {
+public class WorkflowActionEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String name;
-    private String triggerEvent;
+    private String actionType;
     private int delay;
-    private boolean active;
 }

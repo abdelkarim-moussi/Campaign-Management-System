@@ -1,4 +1,4 @@
-package com.app.cms.campaignmanagementsystem.campaign.domain;
+package com.app.cms.campaign.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

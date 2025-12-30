@@ -1,4 +1,4 @@
-package com.app.cms.campaignmanagementsystem.domain;
+package com.app.cms.domain;
 
 public enum CampaignChannelType {
     EMAIL,

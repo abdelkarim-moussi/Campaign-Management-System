@@ -1,4 +1,4 @@
-package com.app.cms.campaignmanagementsystem;
+package com.app.cms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

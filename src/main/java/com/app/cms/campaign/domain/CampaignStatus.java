@@ -1,4 +1,4 @@
-package com.app.cms.campaignmanagementsystem.campaign.domain;
+package com.app.cms.campaign.domain;
 
 public enum CampaignStatus {
     DRAFT,
