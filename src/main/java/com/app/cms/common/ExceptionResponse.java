@@ -1,4 +1,4 @@
-package com.app.cms.common.exception;
+package com.app.cms.common;
 
 import lombok.Builder;
 import lombok.Value;

@@ -1,6 +1,6 @@
 package com.app.cms.common;
 
-import com.app.cms.common.exception.ExceptionResponse;
+import com.app.cms.contact.exception.EmailAlreadyExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,7 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ExceptionResponse> NotFoundException(NotFoundException ex, WebRequest request){
+    public ResponseEntity<ExceptionResponse> handleException(NotFoundException ex, WebRequest request){
         ExceptionResponse response = ExceptionResponse.builder()
                 .status(404)
                 .error("not found")
@@ -19,4 +19,5 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+
 }
