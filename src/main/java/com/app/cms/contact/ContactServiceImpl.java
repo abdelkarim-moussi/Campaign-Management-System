@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,7 +79,23 @@ public class ContactServiceImpl implements ContactService{
 
     @Override
     public ContactEntity updateContact(Long id, ContactDto dto) {
-        return null;
+        log.info("Updating contact: {}", id);
+
+        ContactEntity contact = ContactEntity.builder()
+                .firstName(dto.getFirstName())
+                .lastName(dto.getLastName())
+                .email(dto.getEmail())
+                .phone(dto.getPhone())
+                .company(dto.getCompany())
+                .status(dto.getStatus())
+                .build();
+
+        if (dto.getTagIds() != null) {
+            Set<TagEntity> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            contact.setTags(tags);
+        }
+
+        return contactRepository.save(contact);
     }
 
     @Override
