@@ -1,4 +1,4 @@
-package com.app.cms.contact;
+package com.app.cms.contact.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

@@ -3,7 +3,7 @@ package com.app.cms.campaign.domain;
 import com.app.cms.campaign.MessageType;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class MessageSent {
     private String id;
@@ -14,5 +14,5 @@ public class MessageSent {
     private MessageType type;
     private String errorMessage;
     @CreationTimestamp
-    private Date sentAt;
+    private LocalDateTime sentAt;
 }

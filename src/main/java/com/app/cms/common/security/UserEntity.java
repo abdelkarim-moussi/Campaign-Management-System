@@ -2,10 +2,13 @@ package com.app.cms.common.security;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.management.relation.Role;
 import javax.management.relation.RoleStatus;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +27,10 @@ public class UserEntity {
     private String userName;
     private String email;
     private boolean enabled;
-    private LocalDate createdAt;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @ManyToMany
     @JoinTable(

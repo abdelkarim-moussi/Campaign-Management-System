@@ -1,4 +1,4 @@
-package com.app.cms.domain;
+package com.app.cms.channel;
 
 import jakarta.persistence.*;
 import lombok.*;
