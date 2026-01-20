@@ -17,7 +17,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
-public class Contact {
+public class ContactEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,7 +84,7 @@ public class Contact {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Contact contact = (Contact) o;
+        ContactEntity contact = (ContactEntity) o;
         return getId() != null && Objects.equals(getId(), contact.getId());
     }
 

@@ -113,6 +113,11 @@
             <groupId>org.springframework.modulith</groupId>
             <artifactId>spring-modulith-starter-jpa</artifactId>
         </dependency>
+        <dependency>
+            <groupId>de.huxhorn.sulky</groupId>
+            <artifactId>de.huxhorn.sulky.ulid</artifactId>
+            <version>8.2.0</version>
+        </dependency>
     </dependencies>
 
     <build>
