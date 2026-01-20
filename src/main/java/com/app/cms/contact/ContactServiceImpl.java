@@ -1,5 +1,6 @@
 package com.app.cms.contact;
 
+import com.app.cms.common.NotFoundException;
 import com.app.cms.contact.domain.ContactEntity;
 import com.app.cms.contact.domain.ContactStatus;
 import com.app.cms.contact.domain.TagEntity;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,4 +54,42 @@ public class ContactServiceImpl implements ContactService{
         log.info("Contact created with ID: {}", savedContact.getId());
         return savedContact;
     }
+
+    @Override
+    public ContactEntity getContact(Long id) {
+        return contactRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("contact not found"));
+    }
+
+    @Override
+    public List<ContactEntity> getAllContacts() {
+        return contactRepository.findAll();
+    }
+
+    @Override
+    public List<ContactEntity> getContactsByStatus(ContactStatus status) {
+        return contactRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<ContactEntity> searchContacts(String keyword) {
+        return List.of();
+    }
+
+    @Override
+    public ContactEntity updateContact(Long id, ContactDto dto) {
+        return null;
+    }
+
+    @Override
+    public void deleteContact(Long id) {
+
+    }
+
+    @Override
+    public List<ContactEntity> getContactsByIds(List<Long> ids) {
+        return List.of();
+    }
+
+
 }
