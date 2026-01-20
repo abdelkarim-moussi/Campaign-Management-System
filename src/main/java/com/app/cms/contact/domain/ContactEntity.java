@@ -17,6 +17,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ContactEntity {
 
     @Id
