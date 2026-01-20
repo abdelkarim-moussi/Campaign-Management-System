@@ -27,6 +27,7 @@ public class ContactServiceImpl implements ContactService{
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
+    @Override
     public ContactEntity createContact(ContactDto dto) {
         log.info("Creating contact: {}", dto.getEmail());
 
@@ -77,6 +78,7 @@ public class ContactServiceImpl implements ContactService{
         return List.of();
     }
 
+    @Transactional
     @Override
     public ContactEntity updateContact(Long id, ContactDto dto) {
         log.info("Updating contact: {}", id);
@@ -98,14 +100,21 @@ public class ContactServiceImpl implements ContactService{
         return contactRepository.save(contact);
     }
 
+    @Transactional
     @Override
     public void deleteContact(Long id) {
+        log.info("Deleting contact: {}", id);
 
+        if (!contactRepository.existsById(id)) {
+            throw new NotFoundException("Contact not found: " + id);
+        }
+
+        contactRepository.deleteById(id);
     }
 
     @Override
     public List<ContactEntity> getContactsByIds(List<Long> ids) {
-        return List.of();
+        return contactRepository.findAllById(ids);
     }
 
 
