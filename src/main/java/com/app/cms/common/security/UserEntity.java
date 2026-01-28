@@ -26,6 +26,7 @@ public class UserEntity {
     private String id;
     private String userName;
     private String email;
+    private String password;
     private boolean enabled;
     @CreationTimestamp
     private LocalDateTime createdAt;

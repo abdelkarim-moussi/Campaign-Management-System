@@ -40,9 +40,9 @@ logging:
 
 security:
   jwt:
-    secret:
-      key: "BtaPzv8JojdFGgsjbv8+xnOjnKzdQ72R93Z+XGYSjlg="
+    secret-key: "BtaPzv8JojdFGgsjbv8+xnOjnKzdQ72R93Z+XGYSjlg="
     expiration-time: 3600000
+
     refresh-token:
       expiration-time: 360000000
 

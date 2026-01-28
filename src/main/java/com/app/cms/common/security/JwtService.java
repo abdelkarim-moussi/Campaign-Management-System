@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +20,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
+@Getter
+@Setter
 public class JwtService {
     @Value("security.jwt.secret.key")
     private String secretKey;
@@ -36,6 +40,11 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
+
+    public String extractTokenType(String token){
+        return extractClaim(token,claims -> claims.get("type",String.class));
+    }
+
     public String generateAccessToken(UserDetails userDetails){
         Map<String,Object> claims = new HashMap<>();
         claims.put("type","ACCESS");
@@ -69,6 +78,20 @@ public class JwtService {
 
         return tokens;
     }
+
+    public Map<String,String> refreshTokens(String refreshToken, UserDetails userDetails){
+        String tokenType = extractTokenType(refreshToken);
+
+        if(!"REFRESH".equals(tokenType)){
+            throw new IllegalArgumentException("invalid token type, expects refresh");
+        }
+
+        if(!isTokenValid(refreshToken,userDetails)){
+            throw new IllegalArgumentException("invalid or expired token");
+        }
+        return generateTokenPair(userDetails);
+    }
+
 
     private String buildToken(
             Map<String,Object> claims,
