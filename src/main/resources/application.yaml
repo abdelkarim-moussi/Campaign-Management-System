@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: campaign-management-system
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "jdbc:postgresql://localhost:5432/cms_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC"
+    username: postgres
+    password: "moussi@25"
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "187816912816-v277qohuj5539p02dh4l7ue2fglnbs7o.apps.googleusercontent.com"
+            client-secret: "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"
+            scope:
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    url: /api-docs
+    operations-sorter: method
+
+logging:
+  level:
+    root: WARN
+  file:
+    name: app.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+
+security:
+  jwt:
+    secret-key: "BtaPzv8JojdFGgsjbv8+xnOjnKzdQ72R93Z+XGYSjlg="
+    expiration-time: 3600000
+
+server:
+  port: 8080
