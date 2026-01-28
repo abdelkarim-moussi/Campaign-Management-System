@@ -1,0 +1,9 @@
+2026-01-28T11:16:38.147+01:00  WARN 24376 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-28T11:16:38.510+01:00  WARN 24376 --- [campaign-management-system] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 3b7b6aab-ac7e-40aa-afb2-fc1581826702
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-01-28T11:38:50.293+01:00  WARN 24376 --- [campaign-management-system] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m13s886ms184µs400ns).
+2026-01-28T11:46:41.494+01:00  WARN 24376 --- [campaign-management-system] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m21s88ms652µs600ns).
