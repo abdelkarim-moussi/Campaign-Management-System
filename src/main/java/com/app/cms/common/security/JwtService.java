@@ -23,7 +23,10 @@ public class JwtService {
     private String secretKey;
 
     @Value("security.jwt.expiration-time")
-    private long expirationTime;
+    private long accessTokenExpirationTime;
+
+    @Value("security.jwt.refresh-token.expiration-time")
+    private long refreshTokenExpirationTime;
 
     public String extractUserName(String token){
         return extractClaim(token, Claims::getSubject);
@@ -33,8 +36,10 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    public String generateToken(UserDetails userDetails){
+    public String generateAccessToken(UserDetails userDetails){
         Map<String,Object> claims = new HashMap<>();
+        claims.put("type","ACCESS");
+
         Set<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> authority.startsWith("ROLE_"))
@@ -48,8 +53,16 @@ public class JwtService {
 
         claims.put("permissions",permissions);
 
-        return buildToken(claims,userDetails.getUsername(),expirationTime);
+        return buildToken(claims,userDetails.getUsername(),accessTokenExpirationTime);
     }
+
+    public String generateRefreshToken(UserDetails userDetails){
+        Map<String , Object> claims = new HashMap<>();
+        claims.put("type","REFRESH");
+        return buildToken(claims, userDetails.getUsername(),refreshTokenExpirationTime);
+    }
+
+
     private String buildToken(
             Map<String,Object> claims,
             String userName,
