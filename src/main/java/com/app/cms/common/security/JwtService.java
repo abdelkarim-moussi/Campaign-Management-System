@@ -62,6 +62,13 @@ public class JwtService {
         return buildToken(claims, userDetails.getUsername(),refreshTokenExpirationTime);
     }
 
+    public Map<String,String> generateTokenPair(UserDetails userDetails){
+        Map<String, String > tokens = new HashMap<>();
+        tokens.put("accessToken",generateAccessToken(userDetails));
+        tokens.put("refreshToken",generateRefreshToken(userDetails));
+
+        return tokens;
+    }
 
     private String buildToken(
             Map<String,Object> claims,
