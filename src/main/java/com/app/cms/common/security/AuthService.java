@@ -1,7 +1,6 @@
 package com.app.cms.common.security;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,13 +12,13 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
 
-    @Transactional
-    public ResponseEntity<AuthResponse> authenticate(AuthRequest authRequest){
+    public AuthResponse authenticate(AuthRequest authRequest){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authRequest.getEmail(),authRequest.getPassword())
@@ -28,10 +27,10 @@ public class AuthService {
         if(authentication.isAuthenticated()){
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             Map<String,String> tokens = jwtService.generateTokenPair(userDetails);
-            return ResponseEntity.ok(AuthResponse.builder()
+            return AuthResponse.builder()
                     .accessToken(tokens.get("accessToken"))
                     .refreshToken(tokens.get("refreshToken"))
-                    .build());
+                    .build();
         }else {
             throw new UsernameNotFoundException("Invalid user request");
         }
