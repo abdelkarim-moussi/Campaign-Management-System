@@ -3,7 +3,7 @@ spring:
     name: campaign-management-system
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://localhost:5432/cms_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC"
+    url: "jdbc:postgresql://localhost:5433/cms_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC"
     username: postgres
     password: "moussi@25"
   jpa:
@@ -47,4 +47,4 @@ security:
       expiration-time: 360000000
 
 server:
-  port: 8080
+  port: 9000
