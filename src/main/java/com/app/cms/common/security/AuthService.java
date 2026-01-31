@@ -1,5 +1,6 @@
 package com.app.cms.common.security;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +19,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
 
-    public AuthResponse authenticate(AuthRequest authRequest){
+    public AuthResponse authenticate(@NotNull AuthRequest authRequest){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authRequest.getEmail(),authRequest.getPassword())
@@ -34,6 +35,17 @@ public class AuthService {
         }else {
             throw new UsernameNotFoundException("Invalid user request");
         }
+    }
+
+    public UserEntity initUser(){
+        UserEntity user = UserEntity.builder()
+                .userName("user")
+                .email("user@cms.com")
+                .password("$2a$10$lxloXrmZ414Asny/7PmdEOLd4TvIaDQXdXWpWbxOeZqXeobWry31W")
+                .enabled(true)
+                .build();
+
+        return userRepository.save(user);
     }
 
 }
