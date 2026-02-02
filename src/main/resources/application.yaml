@@ -40,7 +40,7 @@ logging:
 
 security:
   jwt:
-    secret-key: "GrxMcj8j8ZN5ydOmfYbKIZ2UNuuwIQkmz5Qjq7ZXgXc="
+    secret-key: ${"JWT_SECRET_KEY"}
     expiration-time: 3600000
 
     refresh-token:
