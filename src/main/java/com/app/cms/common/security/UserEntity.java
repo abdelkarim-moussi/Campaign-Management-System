@@ -24,7 +24,9 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    @Column(unique = true)
     private String userName;
+    @Column(unique = true)
     private String email;
     private String password;
     private boolean enabled;

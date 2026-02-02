@@ -31,6 +31,8 @@ public class AuthService {
             return AuthResponse.builder()
                     .accessToken(tokens.get("accessToken"))
                     .refreshToken(tokens.get("refreshToken"))
+                    .tokenType("Bearer")
+                    .expiresIn(jwtService.getAccessTokenExpirationTime())
                     .build();
         }else {
             throw new UsernameNotFoundException("Invalid user request");

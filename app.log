@@ -1,18 +1,27 @@
-2026-01-31T16:06:17.987+01:00  WARN 32776 --- [campaign-management-system] [main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Warning Code: 0, SQLState: 00000
-2026-01-31T16:06:17.993+01:00  WARN 32776 --- [campaign-management-system] [main] o.h.engine.jdbc.spi.SqlExceptionHelper   : constraint "uk_ra3d9eht5qmmmnohbrbbxoo35" of relation "campaigns" does not exist, skipping
-2026-01-31T16:06:18.002+01:00  WARN 32776 --- [campaign-management-system] [main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Warning Code: 0, SQLState: 00000
-2026-01-31T16:06:18.002+01:00  WARN 32776 --- [campaign-management-system] [main] o.h.engine.jdbc.spi.SqlExceptionHelper   : constraint "uk_728mksvqr0n907kujew6p3jc0" of relation "contacts" does not exist, skipping
-2026-01-31T16:06:18.010+01:00  WARN 32776 --- [campaign-management-system] [main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Warning Code: 0, SQLState: 00000
-2026-01-31T16:06:18.010+01:00  WARN 32776 --- [campaign-management-system] [main] o.h.engine.jdbc.spi.SqlExceptionHelper   : constraint "uk_t48xdq560gs3gap9g7jg36kgc" of relation "tags" does not exist, skipping
-2026-01-31T16:06:18.440+01:00  WARN 32776 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-31T16:14:47.728+01:00  WARN 32776 --- [campaign-management-system] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m30s943ms342µs300ns).
-2026-01-31T16:16:44.042+01:00  WARN 7032 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-31T16:23:07.091+01:00  WARN 7032 --- [campaign-management-system] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m54s620ms613µs100ns).
-2026-01-31T16:23:13.822+01:00  WARN 34744 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-31T16:32:02.547+01:00  WARN 34744 --- [campaign-management-system] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m50s440ms694µs300ns).
-2026-01-31T16:32:10.211+01:00  WARN 14484 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-31T16:34:11.646+01:00  WARN 15048 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-31T16:36:03.385+01:00  WARN 34416 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-31T16:38:57.242+01:00  WARN 3620 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-31T16:40:55.124+01:00  WARN 3620 --- [campaign-management-system] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=59s802ms939µs500ns).
-2026-01-31T16:45:45.403+01:00  WARN 4900 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-01T14:57:01.005+01:00  WARN 1340 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-01T14:58:49.763+01:00  WARN 22532 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-01T14:59:14.492+01:00  WARN 14152 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-01T15:03:53.656+01:00  WARN 25864 --- [campaign-management-system] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'securityConfig' defined in file [C:\Users\ycode\Desktop\Campaign-Management-System\target\classes\com\app\cms\common\config\SecurityConfig.class]: Unsatisfied dependency expressed through constructor parameter 2: Error creating bean with name 'securityConfig': Requested bean is currently in creation: Is there an unresolvable circular reference?
+2026-02-01T15:03:53.712+01:00 ERROR 25864 --- [campaign-management-system] [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+The dependencies of some of the beans in the application context form a cycle:
+
+┌──->──┐
+|  securityConfig defined in file [C:\Users\ycode\Desktop\Campaign-Management-System\target\classes\com\app\cms\common\config\SecurityConfig.class]
+└──<-──┘
+
+
+Action:
+
+Relying upon circular references is discouraged and they are prohibited by default. Update your application to remove the dependency cycle between beans. As a last resort, it may be possible to break the cycle automatically by setting spring.main.allow-circular-references to true.
+
+2026-02-01T15:09:40.738+01:00  WARN 6804 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-01T15:48:24.957+01:00  WARN 6804 --- [campaign-management-system] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=28m45s821ms512µs100ns).
+2026-02-01T15:56:52.634+01:00  WARN 6804 --- [campaign-management-system] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m27s479ms730µs700ns).
+2026-02-01T16:13:45.006+01:00  WARN 34788 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning

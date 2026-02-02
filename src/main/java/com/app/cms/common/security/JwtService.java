@@ -5,8 +5,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 @Component
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class JwtService {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -31,6 +34,9 @@ public class JwtService {
 
     @Value("${security.jwt.refresh-token.expiration-time}")
     private long refreshTokenExpirationTime;
+
+    private final RedisTemplate<String,String> template;
+    private final String ACTIVE="refresh:active";
 
     public String extractUserName(String token){
         return extractClaim(token, Claims::getSubject);
@@ -68,6 +74,7 @@ public class JwtService {
     public String generateRefreshToken(UserDetails userDetails){
         Map<String , Object> claims = new HashMap<>();
         claims.put("type","REFRESH");
+        String activeKey = ACTIVE+ userDetails.getUsername();
         return buildToken(claims, userDetails.getUsername(),refreshTokenExpirationTime);
     }
 
