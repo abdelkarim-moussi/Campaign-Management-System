@@ -26,5 +26,4 @@ public class TemplateDTO {
 
     private List<String> availableVariables;
 
-
 }
