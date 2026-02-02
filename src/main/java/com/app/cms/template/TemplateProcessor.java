@@ -30,6 +30,26 @@ public class TemplateProcessor {
         return variables;
     }
 
+    private String processTemplate(String template, Map<String,String> variables){
+        if(template == null || template.isEmpty()){
+            return null;
+        }
+
+        String result = template;
+
+        for (Map.Entry<String,String> entry : variables.entrySet()){
+            String placeholder = "{{"+ entry.getKey() + "}}";
+            String value = entry.getValue() ;
+            result = result.replace(placeholder,value);
+        }
+
+        Matcher matcher = VARIABLE_PATTERN.matcher(result);
+        if(matcher.find()){
+            log.warn("Template has unreplaced variables {} ", result);
+        }
+
+        return result;
+    }
 
 
 }
