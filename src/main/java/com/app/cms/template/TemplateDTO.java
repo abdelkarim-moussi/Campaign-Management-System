@@ -1,9 +1,15 @@
 package com.app.cms.template;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class TemplateDTO {
     @NotBlank(message = "name is required")
     private String name;
