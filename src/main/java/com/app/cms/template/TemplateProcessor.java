@@ -30,7 +30,7 @@ public class TemplateProcessor {
         return variables;
     }
 
-    private String processTemplate(String template, Map<String,String> variables){
+    public String processTemplate(String template, Map<String,String> variables){
         if(template == null || template.isEmpty()){
             return null;
         }
@@ -50,6 +50,20 @@ public class TemplateProcessor {
 
         return result;
     }
+
+    public boolean validateVariables(String template, Map<String,String> providedVariables){
+        List<String> requiredVariables = extractVariables(template);
+
+        for(String variable : requiredVariables){
+            if(!providedVariables.containsKey(variable)){
+                log.error("Missing variable {} ", variable);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
 
 }
