@@ -21,6 +21,8 @@ public class TemplateDTO {
 
     private TemplateStatus status = TemplateStatus.DRAFT;
 
+    private String subject;
+
     @NotBlank(message = "content is required")
     private String content;
 
