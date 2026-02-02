@@ -1,9 +1,9 @@
 package com.app.cms.contact;
 
 import com.app.cms.common.NotFoundException;
-import com.app.cms.contact.domain.ContactEntity;
+import com.app.cms.contact.domain.Contact;
 import com.app.cms.contact.domain.ContactStatus;
-import com.app.cms.contact.domain.TagEntity;
+import com.app.cms.contact.domain.Tag;
 import com.app.cms.contact.event.ContactCreatedEvent;
 import com.app.cms.contact.exception.EmailAlreadyExistException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,14 +27,14 @@ public class ContactServiceImpl implements ContactService{
 
     @Transactional
     @Override
-    public ContactEntity createContact(ContactDto dto) {
+    public Contact createContact(ContactDto dto) {
         log.info("Creating contact: {}", dto.getEmail());
 
         if (contactRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistException("Email already exists: " + dto.getEmail());
         }
 
-        ContactEntity contact = ContactEntity.builder()
+        Contact contact = Contact.builder()
                         .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
@@ -45,11 +44,11 @@ public class ContactServiceImpl implements ContactService{
         .build();
 
         if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
-            Set<TagEntity> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
             contact.setTags(tags);
         }
 
-        ContactEntity savedContact = contactRepository.save(contact);
+        Contact savedContact = contactRepository.save(contact);
 
         eventPublisher.publishEvent(new ContactCreatedEvent(savedContact.getId()));
 
@@ -58,32 +57,32 @@ public class ContactServiceImpl implements ContactService{
     }
 
     @Override
-    public ContactEntity getContact(Long id) {
+    public Contact getContact(Long id) {
         return contactRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("contact not found"));
     }
 
     @Override
-    public List<ContactEntity> getAllContacts() {
+    public List<Contact> getAllContacts() {
         return contactRepository.findAll();
     }
 
     @Override
-    public List<ContactEntity> getContactsByStatus(ContactStatus status) {
+    public List<Contact> getContactsByStatus(ContactStatus status) {
         return contactRepository.findByStatus(status);
     }
 
     @Override
-    public List<ContactEntity> searchContacts(String keyword) {
+    public List<Contact> searchContacts(String keyword) {
         return List.of();
     }
 
     @Transactional
     @Override
-    public ContactEntity updateContact(Long id, ContactDto dto) {
+    public Contact updateContact(Long id, ContactDto dto) {
         log.info("Updating contact: {}", id);
 
-        ContactEntity contact = ContactEntity.builder()
+        Contact contact = Contact.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
@@ -93,7 +92,7 @@ public class ContactServiceImpl implements ContactService{
                 .build();
 
         if (dto.getTagIds() != null) {
-            Set<TagEntity> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
             contact.setTags(tags);
         }
 
@@ -113,7 +112,7 @@ public class ContactServiceImpl implements ContactService{
     }
 
     @Override
-    public List<ContactEntity> getContactsByIds(List<Long> ids) {
+    public List<Contact> getContactsByIds(List<Long> ids) {
         return contactRepository.findAllById(ids);
     }
 

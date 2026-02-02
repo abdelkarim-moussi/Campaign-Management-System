@@ -1,6 +1,5 @@
 package com.app.cms;
 
-import com.app.cms.common.security.UserEntity;
 import com.app.cms.common.security.UserRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

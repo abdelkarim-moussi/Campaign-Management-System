@@ -3,9 +3,8 @@ package com.app.cms.statistics.domain;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
-public class CampaignStatsEntity {
+public class Statistic {
     private String id;
     private int totalSent;
     private int totalDelivered;

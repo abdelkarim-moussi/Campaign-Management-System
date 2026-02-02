@@ -1,7 +1,7 @@
 package com.app.cms.campaign.domain;
 
-import com.app.cms.common.security.UserEntity;
-import com.app.cms.template.TemplateEntity;
+import com.app.cms.common.security.User;
+import com.app.cms.template.Template;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CampaignEntity {
+public class Campaign {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -29,10 +29,10 @@ public class CampaignEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity owner;
+    private User owner;
 
     @OneToOne
     @JoinColumn(name = "template_id")
-    private TemplateEntity template;
+    private Template template;
 
 }

@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WorkflowEntity {
+public class Workflow {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
