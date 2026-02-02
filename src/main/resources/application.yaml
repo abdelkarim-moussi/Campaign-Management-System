@@ -3,25 +3,25 @@ spring:
     name: campaign-management-system
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: "jdbc:postgresql://localhost:5433/cms_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC"
-    username: postgres
-    password: "moussi@25"
+    url: ${POSTGRES_DATASOURCE_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: "187816912816-v277qohuj5539p02dh4l7ue2fglnbs7o.apps.googleusercontent.com"
-            client-secret: "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"
-            scope:
-              - profile
-              - email
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            authorization-grant-type: authorization_code
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: "187816912816-v277qohuj5539p02dh4l7ue2fglnbs7o.apps.googleusercontent.com"
+#            client-secret: "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"
+#            scope:
+#              - profile
+#              - email
+#            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+#            authorization-grant-type: authorization_code
 
 springdoc:
   api-docs:
