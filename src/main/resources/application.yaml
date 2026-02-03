@@ -3,25 +3,25 @@ spring:
     name: campaign-management-system
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${POSTGRES_DATASOURCE_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5433/myDb?createDatabaseIfNotExist=true}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          google:
-#            client-id: "187816912816-v277qohuj5539p02dh4l7ue2fglnbs7o.apps.googleusercontent.com"
-#            client-secret: "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"
-#            scope:
-#              - profile
-#              - email
-#            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-#            authorization-grant-type: authorization_code
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:client_id.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET:"Google_client_secret"}
+            scope:
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
 
 springdoc:
   api-docs:
@@ -40,7 +40,7 @@ logging:
 
 security:
   jwt:
-    secret-key: ${JWT_SECRET_KEY}
+    secret-key: ${JWT_SECRET_KEY:custom_jwt_secret_key}
     expiration-time: 3600000
 
     refresh-token:
