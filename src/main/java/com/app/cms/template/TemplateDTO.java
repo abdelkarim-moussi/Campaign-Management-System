@@ -1,6 +1,8 @@
 package com.app.cms.template;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.List;
@@ -16,7 +18,7 @@ public class TemplateDTO {
 
     private String description;
 
-    @NotBlank(message = "template type is required")
+    @NotNull(message = "template type is required")
     private TemplateType type;
 
     private TemplateStatus status = TemplateStatus.DRAFT;
