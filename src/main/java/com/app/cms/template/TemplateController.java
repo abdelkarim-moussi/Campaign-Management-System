@@ -40,4 +40,14 @@ public class TemplateController {
     public ResponseEntity<List<Template>> getTemplatesByType(@RequestParam TemplateType type){
         return ResponseEntity.ok(this.templateService.getTemplatesByType(type));
     }
+
+    @GetMapping("/active/{type}")
+    public ResponseEntity<List<Template>> getActiveTemplatesByType(@PathVariable TemplateType type){
+        return ResponseEntity.ok(this.templateService.getActiveTemplatesByType(type));
+    }
+
+    @GetMapping("/{keyword}")
+    public ResponseEntity<List<Template>> searchTemplates(@PathVariable String keyword){
+        return ResponseEntity.ok(this.templateService.searchTemplates(keyword));
+    }
 }
