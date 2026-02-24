@@ -2,6 +2,7 @@ package com.app.cms.template;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,5 +29,15 @@ public class TemplateController {
     @GetMapping
     public ResponseEntity<List<Template>> getAllTemplates(){
         return ResponseEntity.ok(this.templateService.getAllTemplates());
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<Template>> getActiveTemplates(){
+        return ResponseEntity.ok(this.templateService.getActiveTemplates());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Template>> getTemplatesByType(@RequestParam TemplateType type){
+        return ResponseEntity.ok(this.templateService.getTemplatesByType(type));
     }
 }
