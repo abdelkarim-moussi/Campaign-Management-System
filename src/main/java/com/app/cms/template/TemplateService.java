@@ -1,5 +1,7 @@
 package com.app.cms.template;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     private final TemplateProcessor templateProcessor;
     private final TemplateMapper mapper;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public Template createTemplate(TemplateDTO dto){
@@ -36,7 +39,28 @@ public class TemplateService {
             extractedVars.addAll(templateProcessor.extractVariables(dto.getSubject()));
         }
 
+        try{
+            template.setAvailableVariables(objectMapper.writeValueAsString(extractedVars));
+        }catch (JsonProcessingException exception){
+            log.error("Error Serializing variables ", exception);
+            template.setAvailableVariables("[]");
+        }
 
+        Template saved = templateRepository.save(template);
+        log.info("Template Created With Id : {}",saved.getId());
+
+        return saved;
 
     }
+
+    public Template getTemplate(String id){
+        return templateRepository.findById(id).
+                orElseThrow(() -> new TemplateNotFoundException("No Template Found With Id: "+id));
+    }
+
+    public List<Template> getAllTemplates(){
+        return templateRepository.findAll();
+    }
+
+
 }

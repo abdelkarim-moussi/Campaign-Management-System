@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 @Component
 @Slf4j
 public class TemplateProcessor {
-    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{(\\w+)\\}\\}");
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{(\\w+)}}");
 
     public List<String> extractVariables(String text){
         List<String> variables = new ArrayList<>();
@@ -63,7 +63,5 @@ public class TemplateProcessor {
 
         return true;
     }
-
-
 
 }

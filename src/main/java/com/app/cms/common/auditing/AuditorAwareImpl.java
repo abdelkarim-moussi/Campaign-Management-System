@@ -1,8 +1,5 @@
 package com.app.cms.common.auditing;
 
-import com.app.cms.common.exception.UserNotFoundException;
-import com.app.cms.common.security.User;
-import com.app.cms.common.security.UserRepository;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
