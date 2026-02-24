@@ -50,4 +50,10 @@ public class TemplateController {
     public ResponseEntity<List<Template>> searchTemplates(@PathVariable String keyword){
         return ResponseEntity.ok(this.templateService.searchTemplates(keyword));
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Template> updateTemplate(@PathVariable String id, @RequestBody @Valid TemplateDTO request){
+        Template updatedTemplate = this.templateService.updateTemplate(id,request);
+        return ResponseEntity.ok(updatedTemplate);
+    }
 }
