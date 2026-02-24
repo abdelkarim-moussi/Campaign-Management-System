@@ -2,7 +2,6 @@ package com.app.cms.template;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +35,7 @@ public class TemplateController {
         return ResponseEntity.ok(this.templateService.getActiveTemplates());
     }
 
-    @GetMapping
+    @GetMapping("/byType")
     public ResponseEntity<List<Template>> getTemplatesByType(@RequestParam TemplateType type){
         return ResponseEntity.ok(this.templateService.getTemplatesByType(type));
     }
@@ -46,7 +45,7 @@ public class TemplateController {
         return ResponseEntity.ok(this.templateService.getActiveTemplatesByType(type));
     }
 
-    @GetMapping("/{keyword}")
+    @GetMapping("/search/{keyword}")
     public ResponseEntity<List<Template>> searchTemplates(@PathVariable String keyword){
         return ResponseEntity.ok(this.templateService.searchTemplates(keyword));
     }
