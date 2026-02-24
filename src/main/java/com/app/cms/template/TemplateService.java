@@ -62,5 +62,11 @@ public class TemplateService {
         return templateRepository.findAll();
     }
 
+    public List<Template> getTemplatesByType(TemplateType type){
+        return templateRepository.findByType(type);
+    }
 
+    public List<Template> getActiveTemplates(){
+        return templateRepository.findByStatus(TemplateStatus.ACTIVE);
+    }
 }
