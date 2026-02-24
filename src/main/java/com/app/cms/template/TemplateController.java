@@ -30,9 +30,9 @@ public class TemplateController {
         return ResponseEntity.ok(this.templateService.getAllTemplates());
     }
 
-    @GetMapping("/active")
-    public ResponseEntity<List<Template>> getActiveTemplates(){
-        return ResponseEntity.ok(this.templateService.getActiveTemplates());
+    @GetMapping("/byStatus")
+    public ResponseEntity<List<Template>> getActiveTemplates(@RequestParam TemplateStatus status){
+        return ResponseEntity.ok(this.templateService.getTemplatesByStatus(status));
     }
 
     @GetMapping("/byType")

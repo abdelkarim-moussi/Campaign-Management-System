@@ -66,8 +66,8 @@ public class TemplateService {
         return templateRepository.findByType(type);
     }
 
-    public List<Template> getActiveTemplates(){
-        return templateRepository.findByStatus(TemplateStatus.ACTIVE);
+    public List<Template> getTemplatesByStatus(TemplateStatus status){
+        return templateRepository.findByStatus(status);
     }
 
     public List<Template> getActiveTemplatesByType(TemplateType type){
@@ -77,6 +77,7 @@ public class TemplateService {
     public List<Template> searchTemplates(String keyword){
         return templateRepository.searchTemplates(keyword);
     }
+
 
     @Transactional
     public Template updateTemplate(String id,TemplateDTO dto){
