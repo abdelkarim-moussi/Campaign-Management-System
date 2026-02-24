@@ -77,4 +77,36 @@ public class TemplateService {
     public List<Template> searchTemplates(String keyword){
         return templateRepository.searchTemplates(keyword);
     }
+
+    @Transactional
+    public Template updateTemplate(String id,TemplateDTO dto){
+        log.info("updating template {}", id);
+
+        Template template = getTemplate(id);
+
+        if (!template.getName().equals(dto.getName()) &&
+                templateRepository.existsByName(dto.getName())) {
+                throw new IllegalArgumentException("Template Name Already Exists " + dto.getName());
+        }
+
+        template.setName(dto.getName());
+        template.setDescription(dto.getDescription());
+        template.setStatus(dto.getStatus());
+        template.setSubject(dto.getSubject());
+        template.setContent(dto.getContent());
+
+        List<String> extractedVars = templateProcessor.extractVariables(dto.getContent());
+
+        if(template.getType() == TemplateType.EMAIL){
+            extractedVars.addAll(templateProcessor.extractVariables(dto.getSubject()));
+        }
+
+        try{
+            template.setAvailableVariables(objectMapper.writeValueAsString(extractedVars));
+        }catch (JsonProcessingException e){
+            log.error("Error Serializing variables ",e);
+        }
+
+        return templateRepository.save(template);
+    }
 }
