@@ -2,6 +2,7 @@ package com.app.cms.template;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,23 +27,24 @@ public class TemplateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Template>> getAllTemplates(){
+    public ResponseEntity<List<Template>> getAllTemplates(
+            @RequestParam(required = false) TemplateType type,
+            @RequestParam(required = false) TemplateStatus status){
+
+        if(type != null && status != null){
+            return ResponseEntity.ok(
+                    templateService.getTemplatesByStatus(status)
+                            .stream()
+                            .filter(t -> t.getType().equals(type))
+                            .toList()
+            );
+        }else if(type != null){
+            return ResponseEntity.ok(templateService.getTemplatesByType(type));
+        }else if(status != null){
+            return ResponseEntity.ok(templateService.getTemplatesByStatus(status));
+        }
+
         return ResponseEntity.ok(this.templateService.getAllTemplates());
-    }
-
-    @GetMapping("/byStatus")
-    public ResponseEntity<List<Template>> getActiveTemplates(@RequestParam TemplateStatus status){
-        return ResponseEntity.ok(this.templateService.getTemplatesByStatus(status));
-    }
-
-    @GetMapping("/byType")
-    public ResponseEntity<List<Template>> getTemplatesByType(@RequestParam TemplateType type){
-        return ResponseEntity.ok(this.templateService.getTemplatesByType(type));
-    }
-
-    @GetMapping("/active/{type}")
-    public ResponseEntity<List<Template>> getActiveTemplatesByType(@PathVariable TemplateType type){
-        return ResponseEntity.ok(this.templateService.getActiveTemplatesByType(type));
     }
 
     @GetMapping("/search/{keyword}")
