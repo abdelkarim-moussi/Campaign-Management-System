@@ -81,10 +81,14 @@ public class TemplateService {
     public Template activateTemplate(String id){
         Template template = getTemplate(id);
         template.setStatus(TemplateStatus.ACTIVE);
-        return this.templateRepository.save(template);
+        return templateRepository.save(template);
     }
 
-
+    public Template archiveTemplate(String id){
+        Template template = getTemplate(id);
+        template.setStatus(TemplateStatus.ARCHIVED);
+        return templateRepository.save(template);
+    }
 
     @Transactional
     public Template updateTemplate(String id,TemplateDTO dto){
