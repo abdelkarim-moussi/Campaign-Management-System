@@ -2,11 +2,12 @@ package com.app.cms.template;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
+import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/templates")
@@ -47,6 +48,12 @@ public class TemplateController {
         return ResponseEntity.ok(this.templateService.getAllTemplates());
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Template> updateTemplate(@PathVariable String id, @RequestBody @Valid TemplateDTO request){
+        Template updatedTemplate = this.templateService.updateTemplate(id,request);
+        return ResponseEntity.ok(updatedTemplate);
+    }
+
     @GetMapping("/active")
     public ResponseEntity<List<Template>> getActiveTemplates(@RequestParam TemplateStatus status){
         return ResponseEntity.ok(this.templateService.getTemplatesByStatus(status));
@@ -78,9 +85,12 @@ public class TemplateController {
         return ResponseEntity.ok(this.templateService.searchTemplates(keyword));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Template> updateTemplate(@PathVariable String id, @RequestBody @Valid TemplateDTO request){
-        Template updatedTemplate = this.templateService.updateTemplate(id,request);
-        return ResponseEntity.ok(updatedTemplate);
+    @GetMapping("/{id}/preview")
+    public ResponseEntity<TemplatePreviewResult> previewTemplate(
+            @PathVariable String id,
+            @RequestBody Map<String,String> variables){
+        return ResponseEntity.ok(
+                templateService.previewTemplate(id,variables)
+        );
     }
 }
