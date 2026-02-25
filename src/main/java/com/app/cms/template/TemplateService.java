@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -78,18 +79,6 @@ public class TemplateService {
         return templateRepository.searchTemplates(keyword);
     }
 
-    public Template activateTemplate(String id){
-        Template template = getTemplate(id);
-        template.setStatus(TemplateStatus.ACTIVE);
-        return templateRepository.save(template);
-    }
-
-    public Template archiveTemplate(String id){
-        Template template = getTemplate(id);
-        template.setStatus(TemplateStatus.ARCHIVED);
-        return templateRepository.save(template);
-    }
-
     @Transactional
     public Template updateTemplate(String id,TemplateDTO dto){
         log.info("updating template {}", id);
@@ -98,7 +87,7 @@ public class TemplateService {
 
         if (!template.getName().equals(dto.getName()) &&
                 templateRepository.existsByName(dto.getName())) {
-                throw new IllegalArgumentException("Template Name Already Exists " + dto.getName());
+            throw new IllegalArgumentException("Template Name Already Exists " + dto.getName());
         }
 
         template.setName(dto.getName());
@@ -121,4 +110,33 @@ public class TemplateService {
 
         return templateRepository.save(template);
     }
+
+    public Template activateTemplate(String id){
+        Template template = getTemplate(id);
+        template.setStatus(TemplateStatus.ACTIVE);
+        return templateRepository.save(template);
+    }
+
+    public Template archiveTemplate(String id){
+        Template template = getTemplate(id);
+        template.setStatus(TemplateStatus.ARCHIVED);
+        return templateRepository.save(template);
+    }
+
+    public TemplatePreviewResult previewTemplate(String id, Map<String,String> variables){
+        Template template = getTemplate(id);
+
+        String processedSubject = null;
+        String processedContent = templateProcessor.processTemplate(template.getContent(),variables);
+
+        if(template.getType().equals(TemplateType.EMAIL)){
+            processedSubject = templateProcessor.processTemplate(template.getSubject(),variables);
+        }
+
+        return TemplatePreviewResult.builder()
+                .subject(processedSubject)
+                .content(processedContent)
+                .build();
+    }
+
 }
