@@ -22,5 +22,8 @@ public interface TemplateRepository extends JpaRepository<Template,String> {
     @Query("SELECT t from Template t WHERE t.status = 'ACTIVE' AND t.type = :type")
     List<Template> findActiveTemplatesByType(TemplateType type);
 
+    @Query("SELECT t from Template t WHERE t.status = 'ACTIVE'")
+    List<Template> findActiveTemplates();
+
 
 }

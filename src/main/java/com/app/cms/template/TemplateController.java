@@ -2,7 +2,6 @@ package com.app.cms.template;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +22,7 @@ public class TemplateController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Template> getTemplate(@PathVariable String id){
-        Template template = this.templateService.getTemplate(id);
+        Template template = templateService.getTemplate(id);
         return ResponseEntity.ok(template);
     }
 
@@ -45,18 +44,21 @@ public class TemplateController {
             return ResponseEntity.ok(templateService.getTemplatesByStatus(status));
         }
 
-        return ResponseEntity.ok(this.templateService.getAllTemplates());
+        return ResponseEntity.ok(templateService.getAllTemplates());
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Template> updateTemplate(@PathVariable String id, @RequestBody @Valid TemplateDTO request){
-        Template updatedTemplate = this.templateService.updateTemplate(id,request);
+        Template updatedTemplate = templateService.updateTemplate(id,request);
         return ResponseEntity.ok(updatedTemplate);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<Template>> getActiveTemplates(@RequestParam TemplateStatus status){
-        return ResponseEntity.ok(this.templateService.getTemplatesByStatus(status));
+    public ResponseEntity<List<Template>> getActiveTemplates(@RequestParam(required = false) TemplateType type){
+        if(type != null){
+            return ResponseEntity.ok(templateService.getActiveTemplatesByType(type));
+        }
+        return ResponseEntity.ok(templateService.getActiveTemplates());
     }
 
     @GetMapping("/{id}/variables")
@@ -73,7 +75,7 @@ public class TemplateController {
         );
     }
 
-    @PatchMapping("/{id}/activate")
+    @PatchMapping("/{id}/archive")
     public ResponseEntity<Template> archiveTemplate(@PathVariable String id){
         return ResponseEntity.ok(
                 templateService.archiveTemplate(id)
@@ -82,7 +84,7 @@ public class TemplateController {
 
     @GetMapping("/search/{keyword}")
     public ResponseEntity<List<Template>> searchTemplates(@PathVariable String keyword){
-        return ResponseEntity.ok(this.templateService.searchTemplates(keyword));
+        return ResponseEntity.ok(templateService.searchTemplates(keyword));
     }
 
     @GetMapping("/{id}/preview")
