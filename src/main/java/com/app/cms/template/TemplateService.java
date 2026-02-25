@@ -1,12 +1,14 @@
 package com.app.cms.template;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -137,6 +139,20 @@ public class TemplateService {
                 .subject(processedSubject)
                 .content(processedContent)
                 .build();
+    }
+
+    public List<String> getTemplateVariables(String id){
+        Template template = getTemplate(id);
+
+        try{
+            return objectMapper.readValue(
+                    template.getAvailableVariables()
+                    ,new TypeReference<List<String>>(){}
+            );
+        }catch (JsonProcessingException e){
+            log.error("error extracting template variables : ",e);
+            return List.of();
+        }
     }
 
 }
