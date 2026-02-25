@@ -78,6 +78,13 @@ public class TemplateService {
         return templateRepository.searchTemplates(keyword);
     }
 
+    public Template activateTemplate(String id){
+        Template template = getTemplate(id);
+        template.setStatus(TemplateStatus.ACTIVE);
+        return this.templateRepository.save(template);
+    }
+
+
 
     @Transactional
     public Template updateTemplate(String id,TemplateDTO dto){
