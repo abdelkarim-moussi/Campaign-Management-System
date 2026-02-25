@@ -47,6 +47,32 @@ public class TemplateController {
         return ResponseEntity.ok(this.templateService.getAllTemplates());
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<List<Template>> getActiveTemplates(@RequestParam TemplateStatus status){
+        return ResponseEntity.ok(this.templateService.getTemplatesByStatus(status));
+    }
+
+    @GetMapping("/{id}/variables")
+    public ResponseEntity<List<String>> getTemplateVariables(@PathVariable String id){
+        return ResponseEntity.ok(
+                templateService.getTemplateVariables(id)
+        );
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Template> activateTemplate(@PathVariable String id){
+        return ResponseEntity.ok(
+                templateService.activateTemplate(id)
+        );
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Template> archiveTemplate(@PathVariable String id){
+        return ResponseEntity.ok(
+                templateService.archiveTemplate(id)
+        );
+    }
+
     @GetMapping("/search/{keyword}")
     public ResponseEntity<List<Template>> searchTemplates(@PathVariable String keyword){
         return ResponseEntity.ok(this.templateService.searchTemplates(keyword));
