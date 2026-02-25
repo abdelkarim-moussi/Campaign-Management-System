@@ -157,4 +157,10 @@ public class TemplateService {
         }
     }
 
+    public TemplatePreviewDTO processTemplateForCampaign(String templateId, Map<String,String> templateVariables){
+        return TemplatePreviewDTO.builder()
+                .templateId(templateId)
+                .variables(templateVariables).build();
+    }
+
 }
