@@ -25,6 +25,12 @@ public class ContactController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contact);
     }
 
+    @PostMapping("/import")
+    public ResponseEntity<List<Contact>> importContacts(@Valid @RequestBody List<ContactDto> dtos) {
+        List<Contact> contacts = contactService.importContacts(dtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contacts);
+    }
+
     @GetMapping
     public ResponseEntity<List<Contact>> getAllContacts() {
         return ResponseEntity.ok(contactService.getAllContacts());
@@ -45,7 +51,7 @@ public class ContactController {
         return ResponseEntity.ok(contactService.getContactsByStatus(status));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Contact> updateContact(
             @PathVariable Long id,
             @Valid @RequestBody ContactDto dto) {
