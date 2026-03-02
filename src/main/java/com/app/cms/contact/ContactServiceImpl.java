@@ -1,10 +1,11 @@
 package com.app.cms.contact;
 
 import com.app.cms.common.NotFoundException;
-import com.app.cms.contact.domain.ContactEntity;
+import com.app.cms.contact.domain.Contact;
 import com.app.cms.contact.domain.ContactStatus;
-import com.app.cms.contact.domain.TagEntity;
+import com.app.cms.contact.domain.Tag;
 import com.app.cms.contact.event.ContactCreatedEvent;
+import com.app.cms.contact.event.ContactsImportedEvent;
 import com.app.cms.contact.exception.EmailAlreadyExistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +13,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,28 +29,14 @@ public class ContactServiceImpl implements ContactService{
 
     @Transactional
     @Override
-    public ContactEntity createContact(ContactDto dto) {
+    public Contact createContact(ContactDto dto) {
         log.info("Creating contact: {}", dto.getEmail());
 
         if (contactRepository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistException("Email already exists: " + dto.getEmail());
         }
 
-        ContactEntity contact = ContactEntity.builder()
-                        .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .email(dto.getEmail())
-                .phone(dto.getPhone())
-                .company(dto.getCompany())
-                .status(dto.getStatus() != null ? dto.getStatus() : ContactStatus.LEAD)
-        .build();
-
-        if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
-            Set<TagEntity> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
-            contact.setTags(tags);
-        }
-
-        ContactEntity savedContact = contactRepository.save(contact);
+        Contact savedContact = contactRepository.save(processContact(dto));
 
         eventPublisher.publishEvent(new ContactCreatedEvent(savedContact.getId()));
 
@@ -57,43 +44,86 @@ public class ContactServiceImpl implements ContactService{
         return savedContact;
     }
 
-    @Override
-    public ContactEntity getContact(Long id) {
-        return contactRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("contact not found"));
-    }
-
-    @Override
-    public List<ContactEntity> getAllContacts() {
-        return contactRepository.findAll();
-    }
-
-    @Override
-    public List<ContactEntity> getContactsByStatus(ContactStatus status) {
-        return contactRepository.findByStatus(status);
-    }
-
-    @Override
-    public List<ContactEntity> searchContacts(String keyword) {
-        return List.of();
-    }
-
     @Transactional
     @Override
-    public ContactEntity updateContact(Long id, ContactDto dto) {
-        log.info("Updating contact: {}", id);
+    public List<Contact> importContacts(List<ContactDto> dtos) {
+        log.info("Importing contacts");
 
-        ContactEntity contact = ContactEntity.builder()
+        List<Contact> contacts = new ArrayList<>();
+
+        dtos.forEach(dto -> {
+            if (contactRepository.existsByEmail(dto.getEmail())) {
+               dtos.remove(dto);
+            };
+
+            contacts.add(processContact(dto));
+
+        });
+
+        List<Contact> savedContacts = contactRepository.saveAll(contacts);
+
+        // eventPublisher.publishEvent(new ContactsImportedEvent());
+
+        log.info("Contacts Imported");
+        return savedContacts;
+    }
+
+    private Contact processContact(ContactDto dto) {
+        Contact contact = Contact.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
                 .phone(dto.getPhone())
                 .company(dto.getCompany())
-                .status(dto.getStatus())
+                .status(dto.getStatus() != null ? dto.getStatus() : ContactStatus.LEAD)
                 .build();
 
+        if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
+            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            contact.setTags(tags);
+        }
+
+        return contact;
+    }
+
+    @Override
+    public Contact getContact(Long id) {
+        return contactRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("contact not found"));
+    }
+
+    @Override
+    public List<Contact> getAllContacts() {
+        return contactRepository.findAll();
+    }
+
+    @Override
+    public List<Contact> getContactsByStatus(ContactStatus status) {
+        return contactRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<Contact> searchContacts(String keyword) {
+        return List.of();
+    }
+
+    @Transactional
+    @Override
+    public Contact updateContact(Long id, ContactDto dto) {
+        log.info("Updating contact: {}", id);
+
+        Contact contact = contactRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Contact Not Found With id : "+id));
+
+        contact.setFirstName(dto.getFirstName());
+        contact.setLastName(dto.getLastName());
+        contact.setEmail(dto.getEmail());
+        contact.setPhone(dto.getPhone());
+        contact.setStatus(dto.getStatus());
+        contact.setCompany(dto.getCompany());
+
         if (dto.getTagIds() != null) {
-            Set<TagEntity> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
             contact.setTags(tags);
         }
 
@@ -113,7 +143,7 @@ public class ContactServiceImpl implements ContactService{
     }
 
     @Override
-    public List<ContactEntity> getContactsByIds(List<Long> ids) {
+    public List<Contact> getContactsByIds(List<Long> ids) {
         return contactRepository.findAllById(ids);
     }
 

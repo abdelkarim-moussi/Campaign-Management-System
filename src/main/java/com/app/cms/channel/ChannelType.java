@@ -1,6 +1,6 @@
 package com.app.cms.channel;
 
-public enum CampaignChannelType {
+public enum ChannelType {
     EMAIL,
     SMS,
     MULTI

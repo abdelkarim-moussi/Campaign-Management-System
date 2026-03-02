@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ContactEntity {
+public class Contact {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,7 +46,7 @@ public class ContactEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     @ToString.Exclude
-    private Set<TagEntity> tags = new HashSet<>();
+    private Set<Tag> tags = new HashSet<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -67,12 +67,12 @@ public class ContactEntity {
         return firstName + " " + lastName;
     }
 
-    public void addTag(TagEntity tag) {
+    public void addTag(Tag tag) {
         this.tags.add(tag);
         tag.getContacts().add(this);
     }
 
-    public void removeTag(TagEntity tag) {
+    public void removeTag(Tag tag) {
         this.tags.remove(tag);
         tag.getContacts().remove(this);
     }
@@ -84,7 +84,7 @@ public class ContactEntity {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        ContactEntity contact = (ContactEntity) o;
+        Contact contact = (Contact) o;
         return getId() != null && Objects.equals(getId(), contact.getId());
     }
 

@@ -2,7 +2,7 @@ package com.app.cms.contact.web;
 
 import com.app.cms.contact.ContactDto;
 import com.app.cms.contact.ContactService;
-import com.app.cms.contact.domain.ContactEntity;
+import com.app.cms.contact.domain.Contact;
 import com.app.cms.contact.domain.ContactStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,33 +20,39 @@ public class ContactController {
     private final ContactService contactService;
 
     @PostMapping
-    public ResponseEntity<ContactEntity> createContact(@Valid @RequestBody ContactDto dto) {
-        ContactEntity contact = contactService.createContact(dto);
+    public ResponseEntity<Contact> createContact(@Valid @RequestBody ContactDto dto) {
+        Contact contact = contactService.createContact(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(contact);
     }
 
+    @PostMapping("/import")
+    public ResponseEntity<List<Contact>> importContacts(@Valid @RequestBody List<ContactDto> dtos) {
+        List<Contact> contacts = contactService.importContacts(dtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contacts);
+    }
+
     @GetMapping
-    public ResponseEntity<List<ContactEntity>> getAllContacts() {
+    public ResponseEntity<List<Contact>> getAllContacts() {
         return ResponseEntity.ok(contactService.getAllContacts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ContactEntity> getContact(@PathVariable Long id) {
+    public ResponseEntity<Contact> getContact(@PathVariable Long id) {
         return ResponseEntity.ok(contactService.getContact(id));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ContactEntity>> searchContacts(@RequestParam String keyword) {
+    public ResponseEntity<List<Contact>> searchContacts(@RequestParam String keyword) {
         return ResponseEntity.ok(contactService.searchContacts(keyword));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<ContactEntity>> getContactsByStatus(@PathVariable ContactStatus status) {
+    public ResponseEntity<List<Contact>> getContactsByStatus(@PathVariable ContactStatus status) {
         return ResponseEntity.ok(contactService.getContactsByStatus(status));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ContactEntity> updateContact(
+    @PatchMapping("/{id}")
+    public ResponseEntity<Contact> updateContact(
             @PathVariable Long id,
             @Valid @RequestBody ContactDto dto) {
         return ResponseEntity.ok(contactService.updateContact(id, dto));

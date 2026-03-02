@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class RoleEntity {
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

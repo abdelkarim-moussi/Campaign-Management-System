@@ -1,20 +1,20 @@
-package com.app.cms.automation;
+package com.app.cms.channel;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "workflow_actions")
+@Table(name = "campaign_channels")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WorkflowActionEntity {
+public class Channel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String actionType;
-    private int delay;
+    private ChannelType channelType;
+    private boolean enabled;
 }

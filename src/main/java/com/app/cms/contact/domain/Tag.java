@@ -15,7 +15,7 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class TagEntity {
+public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,7 @@ public class TagEntity {
 
     @ManyToMany(mappedBy = "tags")
     @ToString.Exclude
-    private Set<ContactEntity> contacts = new HashSet<>();
+    private Set<Contact> contacts = new HashSet<>();
 
     @Override
     public final boolean equals(Object o) {
@@ -37,7 +37,7 @@ public class TagEntity {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        TagEntity tag = (TagEntity) o;
+        Tag tag = (Tag) o;
         return getId() != null && Objects.equals(getId(), tag.getId());
     }
 

@@ -39,8 +39,8 @@ public class AuthService {
         }
     }
 
-    public UserEntity initUser(){
-        UserEntity user = UserEntity.builder()
+    public User initUser(){
+        User user = User.builder()
                 .userName("user")
                 .email("user@cms.com")
                 .password("$2a$10$lxloXrmZ414Asny/7PmdEOLd4TvIaDQXdXWpWbxOeZqXeobWry31W")

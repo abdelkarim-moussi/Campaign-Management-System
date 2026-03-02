@@ -21,13 +21,13 @@ public class UserDetailsImpl implements UserDetails {
     private final boolean credentialsNonExpired;
     private final boolean enabled;
 
-    public UserDetailsImpl(UserEntity user) {
+    public UserDetailsImpl(User user) {
         this.userId = user.getId();
         this.userEmail = user.getEmail(); // Use email as username
         this.password = user.getPassword();
         Set<GrantedAuthority> auths = new HashSet<>();
 
-        for (RoleEntity role : user.getRoles()){
+        for (Role role : user.getRoles()){
             auths.add(new SimpleGrantedAuthority("ROLE_"+role.getName()));
             for (PermissionEntity permission : role.getPermissions()){
                 auths.add(new SimpleGrantedAuthority(permission.getName()));

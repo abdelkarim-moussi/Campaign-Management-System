@@ -38,7 +38,7 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("api/v1/auth/**","/swagger-ui/**", "/api-docs/**","/actuator/**")
+                    .requestMatchers("api/v1/auth/**","/swagger-ui/**", "/api-docs/**","/actuator/**","api/v1/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated()
@@ -72,8 +72,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of("http://localhost:8080","http://localhost:3000","http://localhost:4200","http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH"));
-        configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**",configuration);
