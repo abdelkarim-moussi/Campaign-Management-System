@@ -1,38 +1,92 @@
 package com.app.cms.campaign.domain;
 
-import com.app.cms.common.security.User;
+import com.app.cms.contact.Contact;
 import com.app.cms.template.Template;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
-@Table(name="campaigns")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name="campaigns")
 public class Campaign {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    private String title;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name ;
+
+    @Column(length = 2000)
     private String description;
     private String objective;
-    private CampaignStatus campaignStatus;
-    private LocalDateTime lunchDate;
-    @CreationTimestamp
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CampaignStatus status = CampaignStatus.DRAFT;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CampaignChannel channel;
+
+    @Column(nullable = false)
+    private Long templateId;
+
+    @Transient
+    private Template template;
+
+    private LocalDateTime scheduledAt;
+    private LocalDateTime sentAt;
+
+    private Long createdBy;
+
     private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User owner;
+    private LocalDateTime updatedAt;
 
-    @OneToOne
-    @JoinColumn(name = "template_id")
-    private Template template;
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Contact> campaignContacts = new ArrayList<>();
+
+    @PrePersist
+    private void onCreate(){
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void OnUpdate(){
+        updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isDraft() {
+        return this.status == CampaignStatus.DRAFT;
+    }
+
+    public boolean isScheduled() {
+        return this.status == CampaignStatus.SCHEDULED;
+    }
+
+    public boolean isSent() {
+        return this.status == CampaignStatus.SENT;
+    }
+
+    public boolean canBeSent() {
+        return this.status == CampaignStatus.SCHEDULED ||
+                this.status == CampaignStatus.DRAFT;
+    }
+
+    public int getTotalContacts() {
+        return campaignContacts.size();
+    }
 
 }
