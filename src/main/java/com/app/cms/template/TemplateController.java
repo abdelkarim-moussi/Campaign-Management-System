@@ -53,6 +53,12 @@ public class TemplateController {
         return ResponseEntity.ok(updatedTemplate);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTemplate(@PathVariable String id){
+        templateService.deleteTemplate(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/active")
     public ResponseEntity<List<Template>> getActiveTemplates(@RequestParam(required = false) TemplateType type){
         if(type != null){

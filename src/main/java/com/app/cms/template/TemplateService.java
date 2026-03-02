@@ -117,6 +117,15 @@ public class TemplateService {
         return templateRepository.save(template);
     }
 
+    public void deleteTemplate(String id){
+        log.info("deleting template with id : {}", id);
+
+        if(!templateRepository.existsById(id)){
+            throw new TemplateNotFoundException("Template not Found : "+id);
+        }
+        templateRepository.deleteById(id);
+    }
+
     @Transactional
     public Template activateTemplate(String id){
         Template template = getTemplate(id);
