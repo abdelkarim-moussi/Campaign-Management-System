@@ -1,4 +1,4 @@
-package com.app.cms.contact.domain;
+package com.app.cms.contact;
 
 public enum ContactStatus {
     LEAD,

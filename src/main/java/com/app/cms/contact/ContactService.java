@@ -1,12 +1,10 @@
 package com.app.cms.contact;
 
-import com.app.cms.contact.domain.Contact;
-import com.app.cms.contact.domain.ContactStatus;
-
 import java.util.List;
 
 public interface ContactService {
     public Contact createContact(ContactDto dto);
+    public List<Contact> importContacts(List<ContactDto> dtos);
     public Contact getContact(Long id);
     public List<Contact> getAllContacts();
     public List<Contact> getContactsByStatus(ContactStatus status);

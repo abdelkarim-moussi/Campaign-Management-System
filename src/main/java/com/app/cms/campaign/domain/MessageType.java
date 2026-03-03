@@ -1,4 +1,4 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.domain;
 
 public enum MessageType {
     EMAIL,

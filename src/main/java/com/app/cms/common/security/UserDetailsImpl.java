@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Getter
 public class UserDetailsImpl implements UserDetails {
-    private final String userId;
+    private final Long userId;
     private final String userEmail;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;

@@ -1,11 +1,7 @@
 package com.app.cms.contact;
 
 import com.app.cms.common.NotFoundException;
-import com.app.cms.contact.domain.Contact;
-import com.app.cms.contact.domain.ContactStatus;
-import com.app.cms.contact.domain.Tag;
 import com.app.cms.contact.event.ContactCreatedEvent;
-import com.app.cms.contact.event.ContactsImportedEvent;
 import com.app.cms.contact.exception.EmailAlreadyExistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

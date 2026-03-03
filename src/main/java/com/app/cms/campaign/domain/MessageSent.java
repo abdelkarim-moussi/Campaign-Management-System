@@ -1,12 +1,11 @@
 package com.app.cms.campaign.domain;
 
-import com.app.cms.campaign.MessageType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 public class MessageSent {
-    private String id;
+    private Long id;
     private String recipient;
     private String subject;
     private String content;

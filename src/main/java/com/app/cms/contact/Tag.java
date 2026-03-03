@@ -1,4 +1,4 @@
-package com.app.cms.contact.domain;
+package com.app.cms.contact;
 
 import jakarta.persistence.*;
 import lombok.*;
