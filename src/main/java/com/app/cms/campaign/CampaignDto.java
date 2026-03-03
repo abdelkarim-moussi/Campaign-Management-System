@@ -1,17 +1,13 @@
 package com.app.cms.campaign;
 
-import com.app.cms.template.Template;
-import jakarta.annotation.Nullable;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
 public class CampaignDto {
     @NotBlank(message = "campaign name is required")
     private String name ;
