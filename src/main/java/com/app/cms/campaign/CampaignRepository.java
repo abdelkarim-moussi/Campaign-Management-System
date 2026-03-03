@@ -1,8 +1,5 @@
 package com.app.cms.campaign;
 
-import com.app.cms.campaign.domain.Campaign;
-import com.app.cms.campaign.domain.CampaignChannel;
-import com.app.cms.campaign.domain.CampaignStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

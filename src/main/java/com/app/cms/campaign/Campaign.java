@@ -1,12 +1,8 @@
-package com.app.cms.campaign.domain;
+package com.app.cms.campaign;
 
-import com.app.cms.contact.Contact;
 import com.app.cms.template.Template;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedBy;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

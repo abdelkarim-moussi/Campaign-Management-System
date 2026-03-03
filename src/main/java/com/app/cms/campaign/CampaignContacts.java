@@ -1,4 +1,4 @@
-package com.app.cms.campaign.domain;
+package com.app.cms.campaign;
 
 import com.app.cms.contact.Contact;
 import jakarta.persistence.*;

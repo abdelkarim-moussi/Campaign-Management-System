@@ -1,4 +1,4 @@
-package com.app.cms.campaign.domain;
+package com.app.cms.campaign;
 
 import org.hibernate.annotations.CreationTimestamp;
 
