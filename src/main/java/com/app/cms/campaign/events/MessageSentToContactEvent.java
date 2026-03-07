@@ -1,4 +1,8 @@
 package com.app.cms.campaign.events;
 
-public class MessageSentToContactEvent {
-}
+public record MessageSentToContactEvent(
+        Long campaignId,
+        Long contactId,
+        Long messageSentId,
+        String channel
+) {}

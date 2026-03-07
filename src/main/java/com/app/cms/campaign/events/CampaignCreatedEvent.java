@@ -1,4 +1,8 @@
 package com.app.cms.campaign.events;
 
-public class CampaignCreatedEvent {
-}
+import java.time.LocalDateTime;
+
+public record CampaignCreatedEvent(
+        Long campaignId,
+        String campaignName,
+        LocalDateTime createdAt) { }

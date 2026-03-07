@@ -51,7 +51,7 @@ public class Campaign {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CampaignContacts> campaignContacts = new ArrayList<>();
+    private List<CampaignContact> campaignContacts = new ArrayList<>();
 
     @PrePersist
     private void onCreate(){
