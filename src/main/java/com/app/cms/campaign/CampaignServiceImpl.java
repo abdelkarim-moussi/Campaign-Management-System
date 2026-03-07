@@ -179,7 +179,20 @@ public class CampaignServiceImpl implements CampaignService{
 
     @Override
     public void removeContactFromCampaign(Long campaignId, Long contactId) {
+        log.info("Removing contact {} from campaign {}", contactId, campaignId);
 
+        Campaign campaign = getCampaign(campaignId);
+
+        if (!campaign.isDraft()) {
+            throw new IllegalStateException("Can only remove contacts from DRAFT campaigns");
+        }
+
+        CampaignContact cc = campaignContactRepository
+                .findByCampaignIdAndContactId(campaignId, contactId);
+
+        if (cc != null) {
+            campaignContactRepository.delete(cc);
+        }
     }
 
     @Override
