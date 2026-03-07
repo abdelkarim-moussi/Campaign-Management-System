@@ -153,7 +153,28 @@ public class CampaignServiceImpl implements CampaignService{
 
     @Override
     public void addContactsToCampaign(Long campaignId, List<Long> contactIds) {
+        log.info("Adding {} contacts to campaign {}", contactIds.size(), campaignId);
 
+        Campaign campaign = getCampaign(campaignId);
+
+        if (!campaign.isDraft()) {
+            throw new IllegalStateException("Can only add contacts to DRAFT campaigns");
+        }
+
+        List<Contact> contacts = contactService.getContactsByIds(contactIds);
+
+        for (Contact contact : contacts) {
+
+            if (!campaignContactRepository.existsByCampaignIdAndContactId(campaignId, contact.getId())) {
+                CampaignContact cc = CampaignContact.builder()
+                        .campaign(campaign)
+                        .contact(contact)
+                        .status(MessageStatus.PENDING)
+                        .build();
+
+                campaignContactRepository.save(cc);
+            }
+        }
     }
 
     @Override
