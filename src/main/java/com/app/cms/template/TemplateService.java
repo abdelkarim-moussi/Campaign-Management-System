@@ -31,5 +31,5 @@ public interface TemplateService {
 
     List<String> getTemplateVariables(Long id);
 
-    TemplatePreviewDTO processTemplateForCampaign(Long templateId, Map<String,String> templateVariables);
+    TemplatePreviewResult processTemplateForCampaign(Long templateId, Map<String,String> templateVariables);
 }

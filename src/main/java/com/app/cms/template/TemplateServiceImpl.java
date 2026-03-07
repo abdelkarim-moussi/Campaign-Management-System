@@ -169,10 +169,8 @@ public class TemplateServiceImpl implements TemplateService {
         }
     }
 
-    public TemplatePreviewDTO processTemplateForCampaign(Long templateId, Map<String,String> templateVariables){
-        return TemplatePreviewDTO.builder()
-                .templateId(templateId)
-                .variables(templateVariables).build();
+    public TemplatePreviewResult processTemplateForCampaign(Long templateId, Map<String,String> templateVariables){
+        return previewTemplate(templateId,templateVariables);
     }
 
 }
