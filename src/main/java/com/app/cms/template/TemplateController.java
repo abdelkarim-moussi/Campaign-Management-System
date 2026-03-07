@@ -21,7 +21,7 @@ public class TemplateController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Template> getTemplate(@PathVariable String id){
+    public ResponseEntity<Template> getTemplate(@PathVariable Long id){
         Template template = templateService.getTemplate(id);
         return ResponseEntity.ok(template);
     }
@@ -48,13 +48,13 @@ public class TemplateController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Template> updateTemplate(@PathVariable String id, @RequestBody @Valid TemplateDTO request){
+    public ResponseEntity<Template> updateTemplate(@PathVariable Long id, @RequestBody @Valid TemplateDTO request){
         Template updatedTemplate = templateService.updateTemplate(id,request);
         return ResponseEntity.ok(updatedTemplate);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTemplate(@PathVariable String id){
+    public ResponseEntity<Void> deleteTemplate(@PathVariable Long id){
         templateService.deleteTemplate(id);
         return ResponseEntity.noContent().build();
     }
@@ -68,21 +68,21 @@ public class TemplateController {
     }
 
     @GetMapping("/{id}/variables")
-    public ResponseEntity<List<String>> getTemplateVariables(@PathVariable String id){
+    public ResponseEntity<List<String>> getTemplateVariables(@PathVariable Long id){
         return ResponseEntity.ok(
                 templateService.getTemplateVariables(id)
         );
     }
 
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<Template> activateTemplate(@PathVariable String id){
+    public ResponseEntity<Template> activateTemplate(@PathVariable Long id){
         return ResponseEntity.ok(
                 templateService.activateTemplate(id)
         );
     }
 
     @PatchMapping("/{id}/archive")
-    public ResponseEntity<Template> archiveTemplate(@PathVariable String id){
+    public ResponseEntity<Template> archiveTemplate(@PathVariable Long id){
         return ResponseEntity.ok(
                 templateService.archiveTemplate(id)
         );
@@ -95,7 +95,7 @@ public class TemplateController {
 
     @GetMapping("/{id}/preview")
     public ResponseEntity<TemplatePreviewResult> previewTemplate(
-            @PathVariable String id,
+            @PathVariable Long id,
             @RequestBody Map<String,String> variables){
         return ResponseEntity.ok(
                 templateService.previewTemplate(id,variables)

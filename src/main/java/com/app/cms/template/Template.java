@@ -45,12 +45,31 @@ public class Template {
     @Column(columnDefinition = "TEXT")
     private String availableVariables;
 
-    @CreatedBy
     private String createdBy;
 
-    @CreatedDate
     private LocalDateTime createdAt;
-    @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isEmail() {
+        return this.type == TemplateType.EMAIL;
+    }
+
+    public boolean isSms() {
+        return this.type == TemplateType.SMS;
+    }
+
+    public boolean isActive() {
+        return this.status == TemplateStatus.ACTIVE;
+    }
 }

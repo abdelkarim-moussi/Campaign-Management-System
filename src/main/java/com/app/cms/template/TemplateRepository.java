@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface TemplateRepository extends JpaRepository<Template,String> {
+public interface TemplateRepository extends JpaRepository<Template,Long> {
     List<Template> findByType(TemplateType type);
     List<Template> findByStatus(TemplateStatus status);
     List<Template> findByTypeAndStatus(TemplateType type, TemplateStatus status);

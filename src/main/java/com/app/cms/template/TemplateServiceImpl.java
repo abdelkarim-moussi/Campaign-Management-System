@@ -55,7 +55,7 @@ public class TemplateServiceImpl implements TemplateService {
 
     }
 
-    public Template getTemplate(String id){
+    public Template getTemplate(Long id){
         return templateRepository.findById(id).
                 orElseThrow(() -> new TemplateNotFoundException("No Template Found With Id: "+id));
     }
@@ -85,7 +85,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Transactional
-    public Template updateTemplate(String id,TemplateDTO dto){
+    public Template updateTemplate(Long id,TemplateDTO dto){
         log.info("updating template {}", id);
 
         Template template = getTemplate(id);
@@ -116,7 +116,7 @@ public class TemplateServiceImpl implements TemplateService {
         return templateRepository.save(template);
     }
 
-    public void deleteTemplate(String id){
+    public void deleteTemplate(Long id){
         log.info("deleting template with id : {}", id);
 
         if(!templateRepository.existsById(id)){
@@ -126,20 +126,20 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Transactional
-    public Template activateTemplate(String id){
+    public Template activateTemplate(Long id){
         Template template = getTemplate(id);
         template.setStatus(TemplateStatus.ACTIVE);
         return templateRepository.save(template);
     }
 
     @Transactional
-    public Template archiveTemplate(String id){
+    public Template archiveTemplate(Long id){
         Template template = getTemplate(id);
         template.setStatus(TemplateStatus.ARCHIVED);
         return templateRepository.save(template);
     }
 
-    public TemplatePreviewResult previewTemplate(String id, Map<String,String> variables){
+    public TemplatePreviewResult previewTemplate(Long id, Map<String,String> variables){
         Template template = getTemplate(id);
 
         String processedSubject = null;
@@ -155,7 +155,7 @@ public class TemplateServiceImpl implements TemplateService {
                 .build();
     }
 
-    public List<String> getTemplateVariables(String id){
+    public List<String> getTemplateVariables(Long id){
         Template template = getTemplate(id);
 
         try{
@@ -169,7 +169,7 @@ public class TemplateServiceImpl implements TemplateService {
         }
     }
 
-    public TemplatePreviewDTO processTemplateForCampaign(String templateId, Map<String,String> templateVariables){
+    public TemplatePreviewDTO processTemplateForCampaign(Long templateId, Map<String,String> templateVariables){
         return TemplatePreviewDTO.builder()
                 .templateId(templateId)
                 .variables(templateVariables).build();

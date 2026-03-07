@@ -6,7 +6,7 @@ import java.util.Map;
 public interface TemplateService {
     Template createTemplate(TemplateDTO dto);
 
-    Template getTemplate(String id);
+    Template getTemplate(Long id);
 
     List<Template> getAllTemplates();
 
@@ -19,17 +19,17 @@ public interface TemplateService {
 
     List<Template> searchTemplates(String keyword);
 
-    Template updateTemplate(String id,TemplateDTO dto);
+    Template updateTemplate(Long id,TemplateDTO dto);
 
-    void deleteTemplate(String id);
+    void deleteTemplate(Long id);
 
-    Template activateTemplate(String id);
+    Template activateTemplate(Long id);
 
-    Template archiveTemplate(String id);
+    Template archiveTemplate(Long id);
 
-    TemplatePreviewResult previewTemplate(String id, Map<String,String> variables);
+    TemplatePreviewResult previewTemplate(Long id, Map<String,String> variables);
 
-    List<String> getTemplateVariables(String id);
+    List<String> getTemplateVariables(Long id);
 
-    TemplatePreviewDTO processTemplateForCampaign(String templateId, Map<String,String> templateVariables);
+    TemplatePreviewDTO processTemplateForCampaign(Long templateId, Map<String,String> templateVariables);
 }
