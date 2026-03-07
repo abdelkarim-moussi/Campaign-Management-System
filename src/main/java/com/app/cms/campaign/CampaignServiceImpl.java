@@ -104,17 +104,17 @@ public class CampaignServiceImpl implements CampaignService{
 
     @Override
     public List<Campaign> getAllCampaigns() {
-        return List.of();
+        return campaignRepository.findAll();
     }
 
     @Override
     public List<Campaign> getCampaignsByStatus(CampaignStatus status) {
-        return List.of();
+        return campaignRepository.findByStatus(status);
     }
 
     @Override
     public List<Campaign> searchCampaigns(String keyword) {
-        return List.of();
+        return campaignRepository.searchCampaigns(keyword);
     }
 
     @Override
