@@ -138,8 +138,17 @@ public class CampaignServiceImpl implements CampaignService{
     }
 
     @Override
+    @Transactional
     public void deleteCampaign(Long id) {
+        log.info("Deleting campaign: {}", id);
 
+        Campaign campaign = getCampaign(id);
+
+        if (campaign.getStatus() != CampaignStatus.DRAFT) {
+            throw new IllegalStateException("Cannot delete campaign in status: " + campaign.getStatus());
+        }
+
+        campaignRepository.deleteById(id);
     }
 
     @Override
