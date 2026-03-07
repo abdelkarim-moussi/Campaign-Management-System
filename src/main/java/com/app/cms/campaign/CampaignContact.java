@@ -35,7 +35,7 @@ public class CampaignContact {
 
     private LocalDateTime addedAt;
 
-    private LocalDateTime senAt;
+    private LocalDateTime sentAt;
 
     @PrePersist
     private void onCreate (){
