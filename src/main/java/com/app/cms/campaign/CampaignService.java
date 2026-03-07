@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface CampaignService {
     Campaign createCampaign(CampaignDto dto);
-    Campaign getCampaign();
+    Campaign getCampaign(Long id);
     List<Campaign> getAllCampaigns();
     List<Campaign> getCampaignsByStatus(CampaignStatus status);
     List<Campaign> searchCampaigns(String keyword);

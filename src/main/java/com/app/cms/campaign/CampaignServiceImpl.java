@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +29,7 @@ public class CampaignServiceImpl implements CampaignService{
 
 
     @Override
+    @Transactional
     public Campaign createCampaign(CampaignDto dto) {
         log.info("Creating campaign: {}", dto.getName());
 
@@ -49,7 +51,7 @@ public class CampaignServiceImpl implements CampaignService{
             throw new IllegalArgumentException("No valid contacts found");
         }
 
-        // Create Campaign
+
         Campaign campaign = Campaign.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
@@ -58,7 +60,7 @@ public class CampaignServiceImpl implements CampaignService{
                 .templateId(dto.getTemplateId())
                 .build();
 
-        // Define status and date
+
         if (dto.getScheduledAt() != null && dto.getScheduledAt().isAfter(LocalDateTime.now())) {
             campaign.setStatus(CampaignStatus.SCHEDULED);
             campaign.setScheduledAt(dto.getScheduledAt());
@@ -68,7 +70,7 @@ public class CampaignServiceImpl implements CampaignService{
 
         Campaign savedCampaign = campaignRepository.save(campaign);
 
-        // Add contacts
+
         for (Contact contact : contacts) {
             CampaignContact cc = CampaignContact.builder()
                     .campaign(savedCampaign)
@@ -82,7 +84,6 @@ public class CampaignServiceImpl implements CampaignService{
         log.info("Campaign created with ID: {} and {} contacts",
                 savedCampaign.getId(), contacts.size());
 
-        // Publish event
         eventPublisher.publishEvent(new CampaignCreatedEvent(
                 savedCampaign.getId(),
                 savedCampaign.getName(),
@@ -119,7 +120,21 @@ public class CampaignServiceImpl implements CampaignService{
 
     @Override
     public Campaign updateCampaign(Long id, CampaignDto dto) {
-        return null;
+        log.info("Updating campaign: {}", id);
+
+        Campaign campaign = getCampaign(id);
+
+        if (campaign.getStatus() != CampaignStatus.DRAFT &&
+                campaign.getStatus() != CampaignStatus.SCHEDULED) {
+            throw new IllegalStateException("Cannot update campaign in status: " + campaign.getStatus());
+        }
+
+        campaign.setName(dto.getName());
+        campaign.setDescription(dto.getDescription());
+        campaign.setObjective(dto.getObjective());
+        campaign.setScheduledAt(dto.getScheduledAt());
+
+        return campaignRepository.save(campaign);
     }
 
     @Override
