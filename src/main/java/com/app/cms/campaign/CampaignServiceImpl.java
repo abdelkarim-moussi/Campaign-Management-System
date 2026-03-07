@@ -93,8 +93,13 @@ public class CampaignServiceImpl implements CampaignService{
     }
 
     @Override
-    public Campaign getCampaign() {
-        return null;
+    public Campaign getCampaign(Long id) {
+        Campaign campaign = campaignRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Campaign not found: " + id));
+
+        campaign.setTemplate(templateService.getTemplate(campaign.getTemplateId()));
+
+        return campaign;
     }
 
     @Override
