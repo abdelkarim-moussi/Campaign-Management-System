@@ -2,9 +2,15 @@ package com.app.cms.campaign;
 
 import com.app.cms.contact.Contact;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "campaign_contacts")
 public class CampaignContact {
