@@ -1,5 +1,6 @@
 package com.app.cms.campaign;
 
+import com.app.cms.campaign.events.CampaignCreatedEvent;
 import com.app.cms.contact.Contact;
 import com.app.cms.contact.ContactService;
 import com.app.cms.template.Template;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,7 +36,7 @@ public class CampaignServiceImpl implements CampaignService{
         }
 
         Template template = templateService.getTemplate(dto.getTemplateId());
-        
+
         if (dto.getChannel() == CampaignChannel.EMAIL && !template.isEmail()) {
             throw new IllegalArgumentException("Email channel requires an email template");
         }
@@ -42,21 +44,21 @@ public class CampaignServiceImpl implements CampaignService{
             throw new IllegalArgumentException("SMS channel requires an SMS template");
         }
 
-        // Vérifier que les contacts existent
         List<Contact> contacts = contactService.getContactsByIds(dto.getContactIds());
         if (contacts.isEmpty()) {
             throw new IllegalArgumentException("No valid contacts found");
         }
 
-        // Créer la campagne
-        Campaign campaign = new Campaign();
-        campaign.setName(dto.getName());
-        campaign.setDescription(dto.getDescription());
-        campaign.setObjective(dto.getObjective());
-        campaign.setChannel(dto.getChannel());
-        campaign.setTemplateId(dto.getTemplateId());
+        // Create Campaign
+        Campaign campaign = Campaign.builder()
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .objective(dto.getObjective())
+                .channel(dto.getChannel())
+                .templateId(dto.getTemplateId())
+                .build();
 
-        // Définir le statut et la date
+        // Define status and date
         if (dto.getScheduledAt() != null && dto.getScheduledAt().isAfter(LocalDateTime.now())) {
             campaign.setStatus(CampaignStatus.SCHEDULED);
             campaign.setScheduledAt(dto.getScheduledAt());
@@ -66,19 +68,21 @@ public class CampaignServiceImpl implements CampaignService{
 
         Campaign savedCampaign = campaignRepository.save(campaign);
 
-        // Associer les contacts
+        // Add contacts
         for (Contact contact : contacts) {
-            CampaignContact cc = new CampaignContact();
-            cc.setCampaign(savedCampaign);
-            cc.setContact(contact);
-            cc.setStatus(MessageStatus.PENDING);
+            CampaignContact cc = CampaignContact.builder()
+                    .campaign(savedCampaign)
+                    .contact(contact)
+                    .status(MessageStatus.PENDING)
+                    .build();
+
             campaignContactRepository.save(cc);
         }
 
         log.info("Campaign created with ID: {} and {} contacts",
                 savedCampaign.getId(), contacts.size());
 
-        // Publier un event
+        // Publish event
         eventPublisher.publishEvent(new CampaignCreatedEvent(
                 savedCampaign.getId(),
                 savedCampaign.getName(),
