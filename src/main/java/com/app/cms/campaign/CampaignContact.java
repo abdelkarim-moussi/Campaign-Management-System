@@ -29,6 +29,8 @@ public class CampaignContact {
     @JoinColumn(name = "contact_id", nullable = false)
     private Contact contact;
 
+    private Long messageSentId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MessageStatus status = MessageStatus.PENDING;

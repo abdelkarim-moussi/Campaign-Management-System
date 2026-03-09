@@ -2,6 +2,10 @@ package com.app.cms.campaign;
 
 import com.app.cms.campaign.events.CampaignCreatedEvent;
 import com.app.cms.campaign.events.CampaignSentEvent;
+import com.app.cms.channel.ChannelService;
+import com.app.cms.channel.EmailDto;
+import com.app.cms.channel.SendResult;
+import com.app.cms.channel.SmsDto;
 import com.app.cms.contact.Contact;
 import com.app.cms.contact.ContactService;
 import com.app.cms.template.Template;
@@ -28,6 +32,7 @@ public class CampaignServiceImpl implements CampaignService {
 
     private final ContactService contactService;
     private final TemplateService templateService;
+    private final ChannelService channelService;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -231,10 +236,44 @@ public class CampaignServiceImpl implements CampaignService {
                 TemplatePreviewResult processed = templateService.processTemplateForCampaign(template.getId(),
                         variables);
 
-                log.info("Sending to {}: {}", contact.getEmail(), processed.getContent());
+                SendResult result;
 
-                cc.setStatus(MessageStatus.SENT);
-                cc.setSentAt(LocalDateTime.now());
+                if (campaign.getChannel() == CampaignChannel.EMAIL) {
+                    EmailDto emailDto = new EmailDto(
+                            campaign.getId(),
+                            contact.getId(),
+                            contact.getEmail(),
+                            processed.getSubject(),
+                            processed.getContent(),
+                            null,
+                            null
+                    );
+                    result = channelService.sendEmail(emailDto);
+
+                } else if (campaign.getChannel() == CampaignChannel.SMS) {
+                    SmsDto smsDto = new SmsDto(
+                            campaign.getId(),
+                            contact.getId(),
+                            contact.getPhone(),
+                            processed.getContent(),
+                            null
+                    );
+                    result = channelService.sendSms(smsDto);
+
+                } else {
+                    throw new IllegalArgumentException("Unsupported channel: " + campaign.getChannel());
+                }
+
+                if (result.isSuccess()) {
+                    cc.setStatus(com.app.cms.campaign.MessageStatus.SENT);
+                    cc.setMessageSentId(result.getMessageId());
+                    cc.setSentAt(LocalDateTime.now());
+                    successCount++;
+                } else {
+                    cc.setStatus(com.app.cms.campaign.MessageStatus.FAILED);
+                    failureCount++;
+                }
+
                 campaignContactRepository.save(cc);
 
                 successCount++;
