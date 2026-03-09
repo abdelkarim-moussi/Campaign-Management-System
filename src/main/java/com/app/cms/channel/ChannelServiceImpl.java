@@ -5,6 +5,7 @@ import com.app.cms.channel.config.SmsConfig;
 import com.app.cms.channel.events.MessageSentEvent;
 import com.app.cms.channel.internal.PostmarkAdapter;
 import com.app.cms.channel.internal.SmtpAdapter;
+import com.app.cms.channel.internal.TwilioAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
