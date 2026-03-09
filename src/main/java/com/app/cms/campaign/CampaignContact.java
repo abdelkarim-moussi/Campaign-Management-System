@@ -1,6 +1,7 @@
 package com.app.cms.campaign;
 
 import com.app.cms.contact.Contact;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class CampaignContact {
 
     @ManyToOne
     @JoinColumn(name = "campaign_id", nullable = false)
+    @JsonIgnore
     private Campaign campaign;
 
     @ManyToOne
@@ -38,7 +40,7 @@ public class CampaignContact {
     private LocalDateTime sentAt;
 
     @PrePersist
-    private void onCreate (){
+    private void onCreate() {
         addedAt = LocalDateTime.now();
     }
 }

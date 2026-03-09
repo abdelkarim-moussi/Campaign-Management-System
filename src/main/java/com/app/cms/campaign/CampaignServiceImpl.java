@@ -21,7 +21,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CampaignServiceImpl implements CampaignService{
+public class CampaignServiceImpl implements CampaignService {
 
     private final CampaignRepository campaignRepository;
     private final CampaignContactRepository campaignContactRepository;
@@ -30,7 +30,6 @@ public class CampaignServiceImpl implements CampaignService{
     private final TemplateService templateService;
 
     private final ApplicationEventPublisher eventPublisher;
-
 
     @Override
     @Transactional
@@ -55,15 +54,12 @@ public class CampaignServiceImpl implements CampaignService{
             throw new IllegalArgumentException("No valid contacts found");
         }
 
-
-        Campaign campaign = Campaign.builder()
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .objective(dto.getObjective())
-                .channel(dto.getChannel())
-                .templateId(dto.getTemplateId())
-                .build();
-
+        Campaign campaign = new Campaign();
+        campaign.setName(dto.getName());
+        campaign.setDescription(dto.getDescription());
+        campaign.setObjective(dto.getObjective());
+        campaign.setChannel(dto.getChannel());
+        campaign.setTemplateId(dto.getTemplateId());
 
         if (dto.getScheduledAt() != null && dto.getScheduledAt().isAfter(LocalDateTime.now())) {
             campaign.setStatus(CampaignStatus.SCHEDULED);
@@ -74,15 +70,14 @@ public class CampaignServiceImpl implements CampaignService{
 
         Campaign savedCampaign = campaignRepository.save(campaign);
 
-
         for (Contact contact : contacts) {
-            CampaignContact cc = CampaignContact.builder()
-                    .campaign(savedCampaign)
-                    .contact(contact)
-                    .status(MessageStatus.PENDING)
-                    .build();
+            CampaignContact cc = new CampaignContact();
+            cc.setCampaign(savedCampaign);
+            cc.setContact(contact);
+            cc.setStatus(MessageStatus.PENDING);
 
             campaignContactRepository.save(cc);
+            savedCampaign.getCampaignContacts().add(cc);
         }
 
         log.info("Campaign created with ID: {} and {} contacts",
@@ -91,8 +86,7 @@ public class CampaignServiceImpl implements CampaignService{
         eventPublisher.publishEvent(new CampaignCreatedEvent(
                 savedCampaign.getId(),
                 savedCampaign.getName(),
-                savedCampaign.getCreatedAt()
-        ));
+                savedCampaign.getCreatedAt()));
 
         return savedCampaign;
     }
@@ -217,8 +211,7 @@ public class CampaignServiceImpl implements CampaignService{
 
         Template template = templateService.getTemplate(campaign.getTemplateId());
 
-        List<CampaignContact> campaignContacts =
-                campaignContactRepository.findByCampaignId(campaignId);
+        List<CampaignContact> campaignContacts = campaignContactRepository.findByCampaignId(campaignId);
 
         log.info("Sending campaign to {} contacts", campaignContacts.size());
 
@@ -235,8 +228,8 @@ public class CampaignServiceImpl implements CampaignService{
                 variables.put("email", contact.getEmail());
                 variables.put("company", contact.getCompany() != null ? contact.getCompany() : "");
 
-                TemplatePreviewResult processed =
-                        templateService.processTemplateForCampaign(template.getId(), variables);
+                TemplatePreviewResult processed = templateService.processTemplateForCampaign(template.getId(),
+                        variables);
 
                 log.info("Sending to {}: {}", contact.getEmail(), processed.getContent());
 
@@ -266,8 +259,7 @@ public class CampaignServiceImpl implements CampaignService{
                 campaign.getName(),
                 campaign.getChannel(),
                 campaignContacts.size(),
-                campaign.getSentAt()
-        ));
+                campaign.getSentAt()));
     }
 
     @Override
@@ -292,8 +284,7 @@ public class CampaignServiceImpl implements CampaignService{
                 failed,
                 campaign.getScheduledAt(),
                 campaign.getSentAt(),
-                campaign.getCreatedAt()
-        );
+                campaign.getCreatedAt());
     }
 
     @Override

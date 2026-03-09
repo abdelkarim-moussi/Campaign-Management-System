@@ -14,14 +14,14 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name="campaigns")
+@Table(name = "campaigns")
 public class Campaign {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String name ;
+    private String name;
 
     @Column(length = 2000)
     private String description;
@@ -54,13 +54,13 @@ public class Campaign {
     private List<CampaignContact> campaignContacts = new ArrayList<>();
 
     @PrePersist
-    private void onCreate(){
+    private void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    private void OnUpdate(){
+    private void OnUpdate() {
         updatedAt = LocalDateTime.now();
     }
 

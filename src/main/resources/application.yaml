@@ -27,7 +27,7 @@ springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
-    url: /api-docs
+    uri: /api-docs
     operations-sorter: method
 
 logging:
