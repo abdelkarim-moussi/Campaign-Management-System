@@ -11,7 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class Channel {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
