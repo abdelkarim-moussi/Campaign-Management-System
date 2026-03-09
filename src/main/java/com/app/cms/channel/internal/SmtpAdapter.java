@@ -6,6 +6,7 @@ import com.app.cms.channel.config.EmailConfig;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -18,25 +19,12 @@ import java.util.UUID;
 @Slf4j
 public class SmtpAdapter {
     private final EmailConfig emailConfig;
+    private final JavaMailSender mailSender;
 
     public SendResult send(EmailDto emailDto) {
         log.info("Sending email via SMTP to: {}", emailDto.getTo());
 
         try {
-            // Create JavaMailSender
-            JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-            mailSender.setHost(emailConfig.getSmtpHost());
-            mailSender.setPort(emailConfig.getSmtpPort());
-            mailSender.setUsername(emailConfig.getSmtpUsername());
-            mailSender.setPassword(emailConfig.getSmtpPassword());
-
-            Properties props = mailSender.getJavaMailProperties();
-            props.put("mail.transport.protocol", "smtp");
-            props.put("mail.smtp.auth", "true");
-            if (emailConfig.getSmtpUseTls()) {
-                props.put("mail.smtp.starttls.enable", "true");
-            }
-            props.put("mail.debug", "false");
 
             // Create message
             MimeMessage message = mailSender.createMimeMessage();
@@ -51,7 +39,7 @@ public class SmtpAdapter {
             mailSender.send(message);
 
             // Generate Local ID
-            String messageId = "smtp-" + UUID.randomUUID().toString();
+            String messageId = "mailtrap-" + UUID.randomUUID().toString();
 
             log.info("Email sent successfully via SMTP. MessageID: {}", messageId);
             return new SendResult(true, null, messageId, null);
