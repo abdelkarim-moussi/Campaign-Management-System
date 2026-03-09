@@ -129,5 +129,21 @@ public class ChannelServiceImpl implements ChannelService{
     }
 
 
+    public MessageSent getMessage(Long id) {
+        return messageSentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found: " + id));
+    }
+
+
+    public List<MessageSent> getMessagesByCampaign(Long campaignId) {
+        return messageSentRepository.findByCampaignId(campaignId);
+    }
+
+
+    public List<MessageSent> getMessagesByContact(Long contactId) {
+        return messageSentRepository.findByContactId(contactId);
+    }
+
+
 
 }
