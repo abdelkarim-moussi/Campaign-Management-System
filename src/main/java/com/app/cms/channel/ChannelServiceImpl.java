@@ -145,5 +145,26 @@ public class ChannelServiceImpl implements ChannelService{
     }
 
 
+    @Transactional
+    public void updateMessageStatus(String externalId, MessageStatus newStatus) {
+        messageSentRepository.findByExternalId(externalId).ifPresent(message -> {
+            MessageStatus oldStatus = message.getStatus();
+            message.setStatus(newStatus);
 
+            switch (newStatus) {
+                case DELIVERED:
+                    message.setDeliveredAt(LocalDateTime.now());
+                    break;
+                case OPENED:
+                    message.setOpenedAt(LocalDateTime.now());
+                    break;
+                case CLICKED:
+                    message.setClickedAt(LocalDateTime.now());
+                    break;
+            }
+
+            messageSentRepository.save(message);
+            log.info("Message {} status updated: {} -> {}", externalId, oldStatus, newStatus);
+        });
+    }
 }
