@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -77,4 +78,56 @@ public class ChannelServiceImpl implements ChannelService{
         result.setMessageId(savedMessage.getId());
         return result;
     }
+
+    @Transactional
+    public SendResult sendSms(SmsDto smsDto) {
+        log.info("Sending SMS to: {}", smsDto.getTo());
+
+        MessageSent message = new MessageSent();
+        message.setCampaignId(smsDto.getCampaignId());
+        message.setContactId(smsDto.getContactId());
+        message.setType(MessageType.SMS);
+        message.setStatus(MessageStatus.PENDING);
+        message.setRecipient(smsDto.getTo());
+        message.setContent(smsDto.getContent());
+        message.setProvider(smsConfig.getProvider().toUpperCase());
+
+        MessageSent savedMessage = messageSentRepository.save(message);
+
+        SendResult result = switch (smsConfig.getProvider().toLowerCase()) {
+            case "twilio" -> twilioAdapter.send(smsDto);
+            default -> new SendResult(false, null, null, "Unknown SMS provider");
+        };
+
+
+        if (result.isSuccess()) {
+            savedMessage.setStatus(MessageStatus.SENT);
+            savedMessage.setExternalId(result.getExternalId());
+            savedMessage.setSentAt(LocalDateTime.now());
+            log.info("SMS sent successfully. Message ID: {}", savedMessage.getId());
+        } else {
+            savedMessage.setStatus(MessageStatus.FAILED);
+            savedMessage.setErrorMessage(result.getErrorMessage());
+            log.error("Failed to send SMS: {}", result.getErrorMessage());
+        }
+
+        messageSentRepository.save(savedMessage);
+
+
+        eventPublisher.publishEvent(new MessageSentEvent(
+                savedMessage.getId(),
+                savedMessage.getCampaignId(),
+                savedMessage.getContactId(),
+                MessageType.SMS,
+                savedMessage.getRecipient(),
+                result.isSuccess(),
+                savedMessage.getSentAt()
+        ));
+
+        result.setMessageId(savedMessage.getId());
+        return result;
+    }
+
+
+
 }
