@@ -84,11 +84,11 @@ public class DashboardServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Campaign stats not found"));
 
         return List.of(
-                new PerformanceMetrics("Envoyés", stats.getTotalSent(), 100.0),
-                new PerformanceMetrics("Livrés", stats.getTotalDelivered(), stats.getDeliveryRate()),
-                new PerformanceMetrics("Ouverts", stats.getTotalOpened(), stats.getOpenRate()),
-                new PerformanceMetrics("Cliqués", stats.getTotalClicked(), stats.getClickRate()),
-                new PerformanceMetrics("Échecs", stats.getTotalFailed(),
+                new PerformanceMetrics("Send", stats.getTotalSent(), 100.0),
+                new PerformanceMetrics("Delivered", stats.getTotalDelivered(), stats.getDeliveryRate()),
+                new PerformanceMetrics("Opened", stats.getTotalOpened(), stats.getOpenRate()),
+                new PerformanceMetrics("Clicked", stats.getTotalClicked(), stats.getClickRate()),
+                new PerformanceMetrics("Failed", stats.getTotalFailed(),
                         stats.getTotalSent() > 0 ? ((double) stats.getTotalFailed() / stats.getTotalSent()) * 100 : 0.0)
         );
     }
