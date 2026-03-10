@@ -8,6 +8,6 @@ import java.util.Map;
 @Data
 @Builder
 public class TemplatePreviewDTO {
-    private String templateId;
+    private Long templateId;
     private Map<String,String> variables;
 }

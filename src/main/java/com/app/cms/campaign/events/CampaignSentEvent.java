@@ -1,0 +1,13 @@
+package com.app.cms.campaign.events;
+
+import com.app.cms.campaign.CampaignChannel;
+
+import java.time.LocalDateTime;
+
+public record CampaignSentEvent(
+        Long campaignId,
+        String campaignName,
+        CampaignChannel channel,
+        int totalRecipients,
+        LocalDateTime sentAt
+) {}

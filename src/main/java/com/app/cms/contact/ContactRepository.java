@@ -1,7 +1,5 @@
 package com.app.cms.contact;
 
-import com.app.cms.contact.domain.Contact;
-import com.app.cms.contact.domain.ContactStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

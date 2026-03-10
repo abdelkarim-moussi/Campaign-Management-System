@@ -1,6 +1,5 @@
 package com.app.cms.contact;
 
-import com.app.cms.contact.domain.ContactStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

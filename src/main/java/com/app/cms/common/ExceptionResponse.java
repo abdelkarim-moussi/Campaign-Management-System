@@ -13,5 +13,4 @@ public class ExceptionResponse {
     String error;
     String path;
     LocalDateTime timestamp = LocalDateTime.now();
-
 }

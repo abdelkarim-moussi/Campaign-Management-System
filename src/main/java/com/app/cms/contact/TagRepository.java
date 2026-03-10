@@ -1,6 +1,5 @@
 package com.app.cms.contact;
 
-import com.app.cms.contact.domain.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
