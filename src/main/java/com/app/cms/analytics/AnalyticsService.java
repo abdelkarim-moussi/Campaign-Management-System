@@ -83,4 +83,87 @@ public class AnalyticsService {
     }
 
 
+    @Transactional
+    public void trackEvent(Long messageId, Long campaignId, Long contactId,
+                           TrackingEventType eventType, String metadata) {
+        log.info("Tracking event: {} for message {}", eventType, messageId);
+
+        if (messageTrackingRepository.existsByMessageIdAndEventType(messageId, eventType)) {
+            log.debug("Event {} already tracked for message {}", eventType, messageId);
+            return;
+        }
+
+        MessageTracking tracking = new MessageTracking();
+        tracking.setMessageId(messageId);
+        tracking.setCampaignId(campaignId);
+        tracking.setContactId(contactId);
+        tracking.setEventType(eventType);
+        tracking.setEventAt(LocalDateTime.now());
+        messageTrackingRepository.save(tracking);
+
+
+        campaignStatsRepository.findByCampaignId(campaignId).ifPresent(stats -> {
+            switch (eventType) {
+                case OPENED:
+                    stats.setTotalOpened(stats.getTotalOpened() + 1);
+                    break;
+                case CLICKED:
+                    stats.setTotalClicked(stats.getTotalClicked() + 1);
+                    break;
+                case BOUNCED:
+                    stats.setTotalBounced(stats.getTotalBounced() + 1);
+                    break;
+                case UNSUBSCRIBED:
+                    stats.setTotalUnsubscribed(stats.getTotalUnsubscribed() + 1);
+                    break;
+                case SPAM_COMPLAINT:
+                    stats.setTotalSpamComplaints(stats.getTotalSpamComplaints() + 1);
+                    break;
+            }
+
+            stats.calculateRates();
+            campaignStatsRepository.save(stats);
+        });
+    }
+
+
+    public CampaignStatsDto getCampaignStats(Long campaignId) {
+        CampaignStats stats = campaignStatsRepository.findByCampaignId(campaignId)
+                .orElseThrow(() -> new RuntimeException("Campaign stats not found: " + campaignId));
+
+        return new CampaignStatsDto(
+                stats.getCampaignId(),
+                stats.getCampaignName(),
+                stats.getTotalRecipients(),
+                stats.getTotalSent(),
+                stats.getTotalDelivered(),
+                stats.getTotalOpened(),
+                stats.getTotalClicked(),
+                stats.getTotalFailed(),
+                stats.getOpenRate(),
+                stats.getClickRate(),
+                stats.getDeliveryRate(),
+                stats.getFirstSentAt(),
+                stats.getLastUpdatedAt()
+        );
+    }
+
+
+    public List<CampaignStats> getAllCampaignStats() {
+        return campaignStatsRepository.findRecentCampaigns();
+    }
+
+
+    public List<CampaignStats> getTopPerformingCampaigns() {
+        return campaignStatsRepository.findTopPerformingCampaigns();
+    }
+
+
+    public List<MessageTracking> getMessageTracking(Long messageId) {
+        return messageTrackingRepository.findByMessageId(messageId);
+    }
+
+    public List<MessageTracking> getCampaignTracking(Long campaignId) {
+        return messageTrackingRepository.findByCampaignId(campaignId);
+    }
 }
