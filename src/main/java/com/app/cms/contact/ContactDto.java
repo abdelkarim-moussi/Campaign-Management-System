@@ -8,6 +8,7 @@ import java.util.Set;
 
 @Data
 public class ContactDto {
+    
     @NotBlank(message = "First name is required")
     private String firstName;
 
