@@ -1,5 +1,6 @@
 package com.app.cms.user.sevice;
 
+import com.app.cms.common.security.OrganizationContext;
 import com.app.cms.user.dto.InviteUserRequest;
 import com.app.cms.user.dto.UpdateProfileRequest;
 import com.app.cms.user.dto.UserDto;

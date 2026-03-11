@@ -1,6 +1,8 @@
 package com.app.cms.user.sevice;
 
 import com.app.cms.common.security.JwtService;
+import com.app.cms.common.security.OrganizationContext;
+import com.app.cms.common.security.UserDetailsImpl;
 import com.app.cms.user.dto.*;
 import com.app.cms.user.entity.*;
 import com.app.cms.user.mapper.OrganizationMapper;
@@ -10,11 +12,13 @@ import com.app.cms.user.repository.OrganizationRepository;
 import com.app.cms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -59,12 +63,13 @@ public class AuthServiceImpl implements AuthService {
         User savedUser = userRepository.save(user);
         log.info("User created: {} with role OWNER", savedUser.getEmail());
 
-        String token = jwtService.generateTokenPair(user);
+
+        Map<String,String> tokens = jwtService.generateTokenPair(new UserDetailsImpl(user));
 
         UserDto userDto = userMapper.toDto(savedUser);
         OrganizationDto orgDto = organizationMapper.toDto(savedOrg);
 
-        return new LoginResponse(token, userDto, orgDto);
+        return new LoginResponse(tokens, userDto, orgDto);
     }
 
     @Transactional
@@ -92,14 +97,14 @@ public class AuthServiceImpl implements AuthService {
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String token = jwtService.generateTokenPair(user);
+        Map<String,String> tokens = jwtService.generateTokenPair(new UserDetailsImpl(user));
 
         log.info("Login successful: {}", user.getEmail());
 
         UserDto userDto = userMapper.toDto(user);
         OrganizationDto orgDto = organizationMapper.toDto(user.getOrganization());
 
-        return new LoginResponse(token, userDto, orgDto);
+        return new LoginResponse(tokens, userDto, orgDto);
     }
 
     @Transactional
@@ -152,12 +157,12 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Invitation accepted. User created: {}", savedUser.getEmail());
 
-        String token = jwtService.generateTokenPair(savedUser);
+        Map<String,String> tokens = jwtService.generateTokenPair(new UserDetailsImpl(savedUser));
 
         UserDto userDto = userMapper.toDto(savedUser);
         OrganizationDto orgDto = organizationMapper.toDto(org);
 
-        return new LoginResponse(token, userDto, orgDto);
+        return new LoginResponse(tokens, userDto, orgDto);
     }
 
     public UserDto getCurrentUser() {

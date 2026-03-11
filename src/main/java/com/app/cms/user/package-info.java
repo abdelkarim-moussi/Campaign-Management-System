@@ -1,5 +1,6 @@
 @ApplicationModule(
-        displayName = "User Management & Authentication"
+        displayName = "User Management & Authentication",
+        allowedDependencies = {"common"}
 )
 package com.app.cms.user;
 
