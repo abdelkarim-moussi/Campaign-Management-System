@@ -1,11 +1,9 @@
 package com.app.cms.user.sevice;
 
 import com.app.cms.user.dto.InviteUserRequest;
+import com.app.cms.user.dto.UpdateProfileRequest;
 import com.app.cms.user.dto.UserDto;
-import com.app.cms.user.entity.Invitation;
-import com.app.cms.user.entity.InvitationStatus;
-import com.app.cms.user.entity.Organization;
-import com.app.cms.user.entity.User;
+import com.app.cms.user.entity.*;
 import com.app.cms.user.mapper.UserMapper;
 import com.app.cms.user.repository.InvitationRepository;
 import com.app.cms.user.repository.OrganizationRepository;
@@ -81,5 +79,62 @@ public class UserServiceImpl {
                 .stream()
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public UserDto updateProfile(UpdateProfileRequest request) {
+        Long userId = OrganizationContext.getUserId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+        if (request.getTimezone() != null) {
+            user.setTimezone(request.getTimezone());
+        }
+        if (request.getLanguage() != null) {
+            user.setLanguage(request.getLanguage());
+        }
+
+        User updated = userRepository.save(user);
+
+        return userMapper.toDto(updated);
+    }
+
+    @Transactional
+    public UserDto updateUserRole(Long userId, UserRole newRole) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        Long currentUserId = OrganizationContext.getUserId();
+
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("Current user not found"));
+
+        if (!currentUser.canManageUsers()) {
+            throw new SecurityException("You don't have permission to manage users");
+        }
+
+        User user = userRepository.findByIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.isOwner()) {
+            throw new IllegalArgumentException("Cannot modify owner role");
+        }
+
+
+        if (newRole == UserRole.ADMIN && !currentUser.isOwner()) {
+            throw new SecurityException("Only owner can assign admin role");
+        }
+
+        user.setRole(newRole);
+        User updated = userRepository.save(user);
+
+        log.info("User {} role updated to {}", user.getEmail(), newRole);
+
+        return userMapper.toDto(updated);
     }
 }
