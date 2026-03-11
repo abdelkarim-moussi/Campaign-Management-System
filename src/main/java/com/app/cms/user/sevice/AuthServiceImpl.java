@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthServiceImpl {
+public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
     private final InvitationRepository invitationRepository;
@@ -100,5 +100,71 @@ public class AuthServiceImpl {
         OrganizationDto orgDto = organizationMapper.toDto(user.getOrganization());
 
         return new LoginResponse(token, userDto, orgDto);
+    }
+
+    @Transactional
+    public LoginResponse acceptInvitation(AcceptInvitationRequest request) {
+        log.info("Accepting invitation with token: {}", request.getToken());
+
+        Invitation invitation = invitationRepository.findByToken(request.getToken())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid invitation token"));
+
+        if (!invitation.isPending()) {
+            throw new IllegalArgumentException("Invitation is no longer valid");
+        }
+
+        if (invitation.isExpired()) {
+            invitation.setStatus(InvitationStatus.EXPIRED);
+            invitationRepository.save(invitation);
+            throw new IllegalArgumentException("Invitation has expired");
+        }
+
+
+        if (userRepository.existsByEmail(invitation.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+
+        if (!invitation.getOrganization().canAddUser()) {
+            throw new IllegalArgumentException("Organization has reached maximum users limit");
+        }
+
+        User user = new User();
+        user.setOrganization(invitation.getOrganization());
+        user.setEmail(invitation.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setRole(invitation.getRole());
+        user.setStatus(UserStatus.ACTIVE);
+        user.setEmailVerified(true);
+
+        User savedUser = userRepository.save(user);
+
+        invitation.setStatus(InvitationStatus.ACCEPTED);
+        invitation.setAcceptedAt(LocalDateTime.now());
+        invitationRepository.save(invitation);
+
+
+        Organization org = invitation.getOrganization();
+        org.setCurrentUsers(org.getCurrentUsers() + 1);
+        organizationRepository.save(org);
+
+        log.info("Invitation accepted. User created: {}", savedUser.getEmail());
+
+        String token = jwtService.generateTokenPair(savedUser);
+
+        UserDto userDto = userMapper.toDto(savedUser);
+        OrganizationDto orgDto = organizationMapper.toDto(org);
+
+        return new LoginResponse(token, userDto, orgDto);
+    }
+
+    public UserDto getCurrentUser() {
+        Long userId = OrganizationContext.getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return userMapper.toDto(user);
     }
 }
