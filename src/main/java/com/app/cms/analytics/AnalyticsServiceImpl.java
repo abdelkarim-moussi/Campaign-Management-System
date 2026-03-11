@@ -19,7 +19,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final MessageTrackingRepository messageTrackingRepository;
 
     @ApplicationModuleListener
-    @Transactional
     public void onCampaignSent(CampaignSentEvent event) {
         log.info("Analytics: Campaign sent event received for campaign {}", event.campaignId());
 
@@ -41,7 +40,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @ApplicationModuleListener
-    @Transactional
     public void onMessageSent(MessageSentEvent event) {
         log.debug("Analytics: Message sent event received for message {}", event.messageId());
 

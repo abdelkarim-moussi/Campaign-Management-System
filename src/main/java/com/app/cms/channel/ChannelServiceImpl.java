@@ -43,7 +43,6 @@ public class ChannelServiceImpl implements ChannelService{
 
         MessageSent savedMessage = messageSentRepository.save(message);
 
-        // Send via provider
         SendResult result = switch (emailConfig.getProvider().toLowerCase()) {
             case "postmark" -> postmarkAdapter.send(emailDto);
             case "smtp" -> smtpAdapter.send(emailDto);
@@ -59,6 +58,7 @@ public class ChannelServiceImpl implements ChannelService{
         } else {
             savedMessage.setStatus(MessageStatus.FAILED);
             savedMessage.setErrorMessage(result.getErrorMessage());
+            savedMessage.setSentAt(LocalDateTime.now());
             log.error("Failed to send email: {}", result.getErrorMessage());
         }
 

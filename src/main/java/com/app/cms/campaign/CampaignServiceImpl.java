@@ -276,8 +276,6 @@ public class CampaignServiceImpl implements CampaignService {
 
                 campaignContactRepository.save(cc);
 
-                successCount++;
-
             } catch (Exception e) {
                 log.error("Failed to send to contact {}: {}", cc.getContact().getId(), e.getMessage());
                 cc.setStatus(MessageStatus.FAILED);

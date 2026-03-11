@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class DashboardServiceImpl {
+public class DashboardServiceImpl implements DashboardService {
     private final CampaignStatsRepository campaignStatsRepository;
     private final MessageTrackingRepository messageTrackingRepository;
 
