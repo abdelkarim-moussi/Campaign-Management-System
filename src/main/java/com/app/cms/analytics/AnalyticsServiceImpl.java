@@ -2,6 +2,7 @@ package com.app.cms.analytics;
 
 import com.app.cms.campaign.events.CampaignSentEvent;
 import com.app.cms.channel.events.MessageSentEvent;
+import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.modulith.events.ApplicationModuleListener;
@@ -22,8 +23,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     public void onCampaignSent(CampaignSentEvent event) {
         log.info("Analytics: Campaign sent event received for campaign {}", event.campaignId());
 
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         CampaignStats stats = campaignStatsRepository
-                .findByCampaignId(event.campaignId())
+                .findByCampaignIdAndOrganizationId(event.campaignId(),organizationId)
                 .orElse(new CampaignStats());
 
         stats.setCampaignId(event.campaignId());
@@ -43,8 +46,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     public void onMessageSent(MessageSentEvent event) {
         log.debug("Analytics: Message sent event received for message {}", event.messageId());
 
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         CampaignStats stats = campaignStatsRepository
-                .findByCampaignId(event.campaignId())
+                .findByCampaignIdAndOrganizationId(event.campaignId(),organizationId)
                 .orElseGet(() -> {
                     CampaignStats newStats = new CampaignStats();
                     newStats.setCampaignId(event.campaignId());
@@ -86,7 +91,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                            TrackingEventType eventType, String metadata) {
         log.info("Tracking event: {} for message {}", eventType, messageId);
 
-        if (messageTrackingRepository.existsByMessageIdAndEventType(messageId, eventType)) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        if (messageTrackingRepository.existsByMessageIdAndEventTypeAndOrganizationId(messageId, eventType, organizationId)) {
             log.debug("Event {} already tracked for message {}", eventType, messageId);
             return;
         }
@@ -100,7 +107,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         messageTrackingRepository.save(tracking);
 
 
-        campaignStatsRepository.findByCampaignId(campaignId).ifPresent(stats -> {
+        campaignStatsRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId).ifPresent(stats -> {
             switch (eventType) {
                 case OPENED:
                     stats.setTotalOpened(stats.getTotalOpened() + 1);
@@ -126,7 +133,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
 
     public CampaignStatsDto getCampaignStats(Long campaignId) {
-        CampaignStats stats = campaignStatsRepository.findByCampaignId(campaignId)
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        CampaignStats stats = campaignStatsRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId)
                 .orElseThrow(() -> new RuntimeException("Campaign stats not found: " + campaignId));
 
         return new CampaignStatsDto(
@@ -148,20 +158,32 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
 
     public List<CampaignStats> getAllCampaignStats() {
-        return campaignStatsRepository.findRecentCampaigns();
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignStatsRepository.findRecentCampaignsByOrganizationId(organizationId);
     }
 
 
     public List<CampaignStats> getTopPerformingCampaigns() {
-        return campaignStatsRepository.findTopPerformingCampaigns();
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignStatsRepository.findTopPerformingCampaignsByOrganizationId(organizationId);
     }
 
 
     public List<MessageTracking> getMessageTracking(Long messageId) {
-        return messageTrackingRepository.findByMessageId(messageId);
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return messageTrackingRepository.findByMessageIdAndOrganizationId(messageId, organizationId);
     }
 
     public List<MessageTracking> getCampaignTracking(Long campaignId) {
-        return messageTrackingRepository.findByCampaignId(campaignId);
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return messageTrackingRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId);
     }
 }

@@ -7,25 +7,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MessageTrackingRepository extends JpaRepository<MessageTracking,Long> {
-    List<MessageTracking> findByMessageId(Long messageId);
+    List<MessageTracking> findByMessageIdAndOrganizationId(Long messageId, Long orgId);
 
-    List<MessageTracking> findByCampaignId(Long campaignId);
+    List<MessageTracking> findByCampaignIdAndOrganizationId(Long campaignId, Long orgId);
 
-    List<MessageTracking> findByContactId(Long contactId);
+    List<MessageTracking> findByContactIdAndOrganizationId(Long contactId, Long orgId);
 
-    List<MessageTracking> findByEventType(TrackingEventType eventType);
+    List<MessageTracking> findByEventTypeAndOrganizationId(TrackingEventType eventType, Long orgId);
 
-    List<MessageTracking> findByCampaignIdAndEventType(Long campaignId, TrackingEventType eventType);
+    List<MessageTracking> findByCampaignIdAndEventTypeAndOrganizationId(Long campaignId, TrackingEventType eventType, Long orgId);
 
-    List<MessageTracking> findByEventAtBetween(LocalDateTime start, LocalDateTime end);
+    List<MessageTracking> findByEventAtBetweenAndOrganizationId(LocalDateTime start, LocalDateTime end, Long orgId);
 
     @Query("SELECT mt FROM MessageTracking mt WHERE " +
-            "mt.campaignId = :campaignId AND mt.eventType = 'CLICKED'")
-    List<MessageTracking> findClicksByCampaign(Long campaignId);
+            "mt.campaignId = :campaignId AND mt.eventType = 'CLICKED'" +
+            "AND mt.organizationId = :orgId")
+    List<MessageTracking> findClicksByCampaignAndOrganizationId(Long campaignId, Long orgId);
 
     @Query("SELECT COUNT(mt) FROM MessageTracking mt WHERE " +
-            "mt.campaignId = :campaignId AND mt.eventType = :eventType")
-    int countByEvent(Long campaignId, TrackingEventType eventType);
+            "mt.campaignId = :campaignId AND mt.eventType = :eventType" +
+            " AND mt.organizationId = :orgId")
+    int countByEventAndOrganizationId(Long campaignId, TrackingEventType eventType, Long orgId);
 
-    boolean existsByMessageIdAndEventType(Long messageId, TrackingEventType eventType);
+    boolean existsByMessageIdAndEventTypeAndOrganizationId(Long messageId, TrackingEventType eventType,Long orgId);
 }

@@ -16,6 +16,9 @@ public class CampaignStats {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private Long organizationId;
+
     @Column(nullable = false, unique = true)
     private Long campaignId;
 

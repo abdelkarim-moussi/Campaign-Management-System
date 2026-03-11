@@ -1,5 +1,6 @@
 package com.app.cms.analytics;
 
+import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardDto getDashboardStats() {
         log.info("Generating dashboard statistics");
 
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         List<CampaignStats> allStats = campaignStatsRepository.findAll();
 
         int totalCampaigns = allStats.size();
@@ -35,8 +38,8 @@ public class DashboardServiceImpl implements DashboardService {
                 .sum();
 
 
-        Double avgOpenRate = campaignStatsRepository.getAverageOpenRate();
-        Double avgClickRate = campaignStatsRepository.getAverageClickRate();
+        Double avgOpenRate = campaignStatsRepository.getAverageOpenRateByOrganizationId(organizationId);
+        Double avgClickRate = campaignStatsRepository.getAverageClickRateByOrganizationId(organizationId);
         Double avgDeliveryRate = totalSent > 0 ?
                 ((double) totalDelivered / totalSent) * 100 : 0.0;
 
@@ -45,7 +48,7 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
 
         List<CampaignStats> thisMonthStats = campaignStatsRepository
-                .findByCreatedAtBetween(startOfMonth, endOfMonth);
+                .findByCreatedAtBetweenAndOrganizationId(startOfMonth, endOfMonth, organizationId);
 
         int campaignsThisMonth = thisMonthStats.size();
         int messagesSentThisMonth = thisMonthStats.stream()
@@ -57,7 +60,7 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime endOfDay = LocalDateTime.now().toLocalDate().atTime(23, 59, 59);
 
         List<MessageTracking> todayMessages = messageTrackingRepository
-                .findByEventAtBetween(startOfDay, endOfDay);
+                .findByEventAtBetweenAndOrganizationId(startOfDay, endOfDay, organizationId);
 
         int messagesSentToday = (int) todayMessages.stream()
                 .filter(mt -> mt.getEventType() == TrackingEventType.SENT)
@@ -80,7 +83,10 @@ public class DashboardServiceImpl implements DashboardService {
 
 
     public List<PerformanceMetrics> getPerformanceMetrics(Long campaignId) {
-        CampaignStats stats = campaignStatsRepository.findByCampaignId(campaignId)
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        CampaignStats stats = campaignStatsRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId)
                 .orElseThrow(() -> new RuntimeException("Campaign stats not found"));
 
         return List.of(

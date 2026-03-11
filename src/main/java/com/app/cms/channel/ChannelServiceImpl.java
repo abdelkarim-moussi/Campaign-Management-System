@@ -6,6 +6,7 @@ import com.app.cms.channel.events.MessageSentEvent;
 import com.app.cms.channel.internal.PostmarkAdapter;
 import com.app.cms.channel.internal.SmtpAdapter;
 import com.app.cms.channel.internal.TwilioAdapter;
+import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,15 +32,7 @@ public class ChannelServiceImpl implements ChannelService{
     public SendResult sendEmail(EmailDto emailDto) {
         log.info("Sending email to: {}", emailDto.getTo());
 
-        MessageSent message = new MessageSent();
-        message.setCampaignId(emailDto.getCampaignId());
-        message.setContactId(emailDto.getContactId());
-        message.setType(MessageType.EMAIL);
-        message.setStatus(MessageStatus.PENDING);
-        message.setRecipient(emailDto.getTo());
-        message.setSubject(emailDto.getSubject());
-        message.setContent(emailDto.getContent());
-        message.setProvider(emailConfig.getProvider().toUpperCase());
+        MessageSent message = setEmail(emailDto);
 
         MessageSent savedMessage = messageSentRepository.save(message);
 
@@ -79,18 +72,27 @@ public class ChannelServiceImpl implements ChannelService{
         return result;
     }
 
+    private MessageSent setEmail(EmailDto emailDto) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        MessageSent message = new MessageSent();
+        message.setOrganizationId(organizationId);
+        message.setCampaignId(emailDto.getCampaignId());
+        message.setContactId(emailDto.getContactId());
+        message.setType(MessageType.EMAIL);
+        message.setStatus(MessageStatus.PENDING);
+        message.setRecipient(emailDto.getTo());
+        message.setSubject(emailDto.getSubject());
+        message.setContent(emailDto.getContent());
+        message.setProvider(emailConfig.getProvider().toUpperCase());
+        return message;
+    }
+
     @Transactional
     public SendResult sendSms(SmsDto smsDto) {
         log.info("Sending SMS to: {}", smsDto.getTo());
 
-        MessageSent message = new MessageSent();
-        message.setCampaignId(smsDto.getCampaignId());
-        message.setContactId(smsDto.getContactId());
-        message.setType(MessageType.SMS);
-        message.setStatus(MessageStatus.PENDING);
-        message.setRecipient(smsDto.getTo());
-        message.setContent(smsDto.getContent());
-        message.setProvider(smsConfig.getProvider().toUpperCase());
+        MessageSent message = setSms(smsDto);
 
         MessageSent savedMessage = messageSentRepository.save(message);
 
@@ -128,26 +130,49 @@ public class ChannelServiceImpl implements ChannelService{
         return result;
     }
 
+    private MessageSent setSms(SmsDto smsDto) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        MessageSent message = new MessageSent();
+        message.setOrganizationId(organizationId);
+        message.setCampaignId(smsDto.getCampaignId());
+        message.setContactId(smsDto.getContactId());
+        message.setType(MessageType.SMS);
+        message.setStatus(MessageStatus.PENDING);
+        message.setRecipient(smsDto.getTo());
+        message.setContent(smsDto.getContent());
+        message.setProvider(smsConfig.getProvider().toUpperCase());
+        return message;
+    }
+
 
     public MessageSent getMessage(Long id) {
-        return messageSentRepository.findById(id)
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return messageSentRepository.findByIdAndOrganizationId(id,organizationId)
                 .orElseThrow(() -> new RuntimeException("Message not found: " + id));
     }
 
 
     public List<MessageSent> getMessagesByCampaign(Long campaignId) {
-        return messageSentRepository.findByCampaignId(campaignId);
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return messageSentRepository.findByCampaignIdAndOrganizationId(campaignId,organizationId);
     }
 
 
     public List<MessageSent> getMessagesByContact(Long contactId) {
-        return messageSentRepository.findByContactId(contactId);
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return messageSentRepository.findByContactIdAndOrganizationId(contactId, organizationId);
     }
 
 
     @Transactional
     public void updateMessageStatus(String externalId, MessageStatus newStatus) {
-        messageSentRepository.findByExternalId(externalId).ifPresent(message -> {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        messageSentRepository.findByExternalIdAndOrganizationId(externalId, organizationId).ifPresent(message -> {
             MessageStatus oldStatus = message.getStatus();
             message.setStatus(newStatus);
 

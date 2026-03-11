@@ -8,20 +8,23 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CampaignStatsRepository extends JpaRepository<CampaignStats,Long> {
-    Optional<CampaignStats> findByCampaignId(Long campaignId);
+    Optional<CampaignStats> findByCampaignIdAndOrganizationId(Long campaignId,Long orgId);
 
-    List<CampaignStats> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    List<CampaignStats> findByCreatedAtBetweenAndOrganizationId(LocalDateTime start, LocalDateTime end, Long orgId);
 
     @Query("SELECT cs FROM CampaignStats cs ORDER BY cs.openRate DESC")
-    List<CampaignStats> findTopPerformingCampaigns();
+    List<CampaignStats> findTopPerformingCampaignsByOrganizationId(Long orgId);
 
-    @Query("SELECT cs FROM CampaignStats cs WHERE cs.totalSent > 0 " +
+    @Query("SELECT cs FROM CampaignStats cs WHERE cs.organizationId = :orgId " +
+            "AND cs.totalSent > 0 " +
             "ORDER BY cs.lastUpdatedAt DESC")
-    List<CampaignStats> findRecentCampaigns();
+    List<CampaignStats> findRecentCampaignsByOrganizationId(Long orgId);
 
-    @Query("SELECT AVG(cs.openRate) FROM CampaignStats cs WHERE cs.totalSent > 0")
-    Double getAverageOpenRate();
+    @Query("SELECT AVG(cs.openRate) FROM CampaignStats cs WHERE cs.totalSent > 0 " +
+            "AND cs.organizationId = :orgId")
+    Double getAverageOpenRateByOrganizationId(Long orgId);
 
-    @Query("SELECT AVG(cs.clickRate) FROM CampaignStats cs WHERE cs.totalSent > 0")
-    Double getAverageClickRate();
+    @Query("SELECT AVG(cs.clickRate) FROM CampaignStats cs WHERE cs.totalSent > 0" +
+            " AND cs.organizationId = :orgId")
+    Double getAverageClickRateByOrganizationId(Long orgId);
 }

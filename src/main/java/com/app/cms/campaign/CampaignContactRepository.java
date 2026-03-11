@@ -7,22 +7,23 @@ import java.util.List;
 
 public interface CampaignContactRepository extends JpaRepository<CampaignContact, Long> {
 
-    List<CampaignContact> findByCampaignId(Long campaignId);
+    List<CampaignContact> findByCampaignIdAndOrganizationId(Long campaignId,Long orgId);
 
-    List<CampaignContact> findByContactId(Long contactId);
+    List<CampaignContact> findByContactIdAndOrganizationId(Long contactId,Long orgId);
 
-    List<CampaignContact> findByCampaignIdAndStatus(Long campaignId, MessageStatus status);
+    List<CampaignContact> findByCampaignIdAndStatusAndOrganizationId(Long campaignId, MessageStatus status, Long orgId);
 
     @Query("SELECT cc FROM CampaignContact cc WHERE " +
-            "cc.campaign.id = :campaignId AND cc.contact.id = :contactId")
-    CampaignContact findByCampaignIdAndContactId(Long campaignId, Long contactId);
+            "cc.campaign.id = :campaignId AND cc.contact.id = :contactId AND cc.organizationId = :orgId")
+    CampaignContact findByCampaignIdAndContactIdAndOrganizationId(Long campaignId, Long contactId, Long orgId);
 
-    boolean existsByCampaignIdAndContactId(Long campaignId, Long contactId);
+    boolean existsByCampaignIdAndContactIdAndOrganizationId(Long campaignId, Long contactId, Long orgId);
 
     @Query("SELECT COUNT(cc) FROM CampaignContact cc WHERE cc.campaign.id = :campaignId")
-    int countByCampaignId(Long campaignId);
+    int countByCampaignIdAndOrganizationId(Long campaignId,Long orgId);
 
     @Query("SELECT COUNT(cc) FROM CampaignContact cc WHERE " +
-            "cc.campaign.id = :campaignId AND cc.status = :status")
-    int countByCampaignIdAndStatus(Long campaignId, MessageStatus status);
+            "cc.campaign.id = :campaignId AND cc.status = :status " +
+            "AND cc.organizationId = :orgId")
+    int countByCampaignIdAndStatusAndOrganizationId(Long campaignId, MessageStatus status, Long orgId);
 }

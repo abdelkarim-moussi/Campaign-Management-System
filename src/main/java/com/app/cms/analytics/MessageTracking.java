@@ -20,6 +20,9 @@ public class MessageTracking {
     private Long id;
 
     @Column(nullable = false)
+    private Long organizationId;
+
+    @Column(nullable = false)
     private Long messageId;
 
     private Long campaignId;

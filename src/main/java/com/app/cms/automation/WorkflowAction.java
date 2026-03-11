@@ -15,6 +15,8 @@ public class WorkflowAction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
+    private Long organizationId;
     private String actionType;
     private int delay;
 }

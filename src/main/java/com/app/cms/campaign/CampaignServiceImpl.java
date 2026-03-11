@@ -6,6 +6,7 @@ import com.app.cms.channel.ChannelService;
 import com.app.cms.channel.EmailDto;
 import com.app.cms.channel.SendResult;
 import com.app.cms.channel.SmsDto;
+import com.app.cms.common.security.OrganizationContext;
 import com.app.cms.contact.Contact;
 import com.app.cms.contact.ContactService;
 import com.app.cms.template.Template;
@@ -41,7 +42,9 @@ public class CampaignServiceImpl implements CampaignService {
     public Campaign createCampaign(CampaignDto dto) {
         log.info("Creating campaign: {}", dto.getName());
 
-        if (campaignRepository.existsByName(dto.getName())) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        if (campaignRepository.existsByNameAndOrganizationId(dto.getName(),organizationId)) {
             throw new IllegalArgumentException("Campaign name already exists: " + dto.getName());
         }
 
@@ -98,7 +101,10 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public Campaign getCampaign(Long id) {
-        Campaign campaign = campaignRepository.findById(id)
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        Campaign campaign = campaignRepository.findByIdAndOrganizationId(id,organizationId)
                 .orElseThrow(() -> new RuntimeException("Campaign not found: " + id));
 
         campaign.setTemplate(templateService.getTemplate(campaign.getTemplateId()));
@@ -108,17 +114,26 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public List<Campaign> getAllCampaigns() {
-        return campaignRepository.findAll();
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignRepository.findAllByOrganizationId(organizationId);
     }
 
     @Override
     public List<Campaign> getCampaignsByStatus(CampaignStatus status) {
-        return campaignRepository.findByStatus(status);
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignRepository.findByStatusAndOrganizationId(status, organizationId);
     }
 
     @Override
     public List<Campaign> searchCampaigns(String keyword) {
-        return campaignRepository.searchCampaigns(keyword);
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignRepository.searchCampaignsByOrganizationId(keyword,organizationId);
     }
 
     @Override
@@ -159,6 +174,8 @@ public class CampaignServiceImpl implements CampaignService {
     public void addContactsToCampaign(Long campaignId, List<Long> contactIds) {
         log.info("Adding {} contacts to campaign {}", contactIds.size(), campaignId);
 
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         Campaign campaign = getCampaign(campaignId);
 
         if (!campaign.isDraft()) {
@@ -169,7 +186,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         for (Contact contact : contacts) {
 
-            if (!campaignContactRepository.existsByCampaignIdAndContactId(campaignId, contact.getId())) {
+            if (!campaignContactRepository.existsByCampaignIdAndContactIdAndOrganizationId(campaignId, contact.getId(),organizationId)) {
                 CampaignContact cc = CampaignContact.builder()
                         .campaign(campaign)
                         .contact(contact)
@@ -186,6 +203,8 @@ public class CampaignServiceImpl implements CampaignService {
     public void removeContactFromCampaign(Long campaignId, Long contactId) {
         log.info("Removing contact {} from campaign {}", contactId, campaignId);
 
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         Campaign campaign = getCampaign(campaignId);
 
         if (!campaign.isDraft()) {
@@ -193,7 +212,7 @@ public class CampaignServiceImpl implements CampaignService {
         }
 
         CampaignContact cc = campaignContactRepository
-                .findByCampaignIdAndContactId(campaignId, contactId);
+                .findByCampaignIdAndContactIdAndOrganizationId(campaignId, contactId, organizationId);
 
         if (cc != null) {
             campaignContactRepository.delete(cc);
@@ -204,6 +223,8 @@ public class CampaignServiceImpl implements CampaignService {
     @Transactional
     public void sendCampaign(Long campaignId) {
         log.info("Starting to send campaign: {}", campaignId);
+
+        Long organizationId = OrganizationContext.getOrganizationId();
 
         Campaign campaign = getCampaign(campaignId);
 
@@ -216,7 +237,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         Template template = templateService.getTemplate(campaign.getTemplateId());
 
-        List<CampaignContact> campaignContacts = campaignContactRepository.findByCampaignId(campaignId);
+        List<CampaignContact> campaignContacts = campaignContactRepository.findByCampaignIdAndOrganizationId(campaignId,organizationId);
 
         log.info("Sending campaign to {} contacts", campaignContacts.size());
 
@@ -301,13 +322,16 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public CampaignSummaryDto getCampaignSummary(Long campaignId) {
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         Campaign campaign = getCampaign(campaignId);
 
-        int total = campaignContactRepository.countByCampaignId(campaignId);
-        int sent = campaignContactRepository.countByCampaignIdAndStatus(campaignId, MessageStatus.SENT);
-        int delivered = campaignContactRepository.countByCampaignIdAndStatus(campaignId, MessageStatus.DELIVERED);
-        int opened = campaignContactRepository.countByCampaignIdAndStatus(campaignId, MessageStatus.OPENED);
-        int failed = campaignContactRepository.countByCampaignIdAndStatus(campaignId, MessageStatus.FAILED);
+        int total = campaignContactRepository.countByCampaignIdAndOrganizationId(campaignId,organizationId);
+        int sent = campaignContactRepository.countByCampaignIdAndStatusAndOrganizationId(campaignId, MessageStatus.SENT, organizationId);
+        int delivered = campaignContactRepository.countByCampaignIdAndStatusAndOrganizationId(campaignId, MessageStatus.DELIVERED, organizationId);
+        int opened = campaignContactRepository.countByCampaignIdAndStatusAndOrganizationId(campaignId, MessageStatus.OPENED, organizationId);
+        int failed = campaignContactRepository.countByCampaignIdAndStatusAndOrganizationId(campaignId, MessageStatus.FAILED, organizationId);
 
         return new CampaignSummaryDto(
                 campaign.getId(),
@@ -326,6 +350,9 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public List<CampaignContact> getCampaignContacts(Long campaignId) {
-        return campaignContactRepository.findByCampaignId(campaignId);
+        
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignContactRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId);
     }
 }

@@ -5,20 +5,26 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface CampaignRepository extends JpaRepository<Campaign,Long> {
 
-    List<Campaign> findByStatus(CampaignStatus status);
-    List<Campaign> findByChannel(CampaignChannel channel);
-    List<Campaign> findByCreatedBy(Long userId);
+    Optional<Campaign> findByIdAndOrganizationId(Long campId,Long orgId);
 
-    @Query("SELECT c FROM Campaign c WHERE c.status = 'SCHEDULED' AND c.scheduledAt <= :now")
-    List<Campaign> findScheduledCampaignsToSend(LocalDateTime now);
+    List<Campaign> findAllByOrganizationId(Long orgId);
+
+    List<Campaign> findByStatusAndOrganizationId(CampaignStatus status,Long orgId);
+    List<Campaign> findByChannelAndOrganizationId(CampaignChannel channel, Long orgId);
+    List<Campaign> findByCreatedByAndOrganizationId(Long userId, Long orgId);
+
+    @Query("SELECT c FROM Campaign c WHERE c.status = 'SCHEDULED' AND c.scheduledAt <= :now AND c.organizationId = :orgId")
+    List<Campaign> findScheduledCampaignsToSendByOrganizationId(LocalDateTime now, Long orgId);
 
     @Query("SELECT c FROM Campaign c WHERE " +
             "LOWER(c.name) LIKE LOWER(CONCAT('%',:keyword,'%')) " +
-            "OR LOWER(c.description) LIKE LOWER(CONCAT('%',:keyword,'%') ) ")
-    List<Campaign> searchCampaigns(String keyword);
+            "OR LOWER(c.description) LIKE LOWER(CONCAT('%',:keyword,'%') ) " +
+            "HAVING c.organizationId = :orgId")
+    List<Campaign> searchCampaignsByOrganizationId(String keyword, Long orgId);
 
-    boolean existsByName(String name);
+    boolean existsByNameAndOrganizationId(String name, Long orgId);
 }

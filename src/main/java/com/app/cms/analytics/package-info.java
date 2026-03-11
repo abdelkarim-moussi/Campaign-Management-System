@@ -1,6 +1,6 @@
 @ApplicationModule(
         displayName = "Analytics & Reporting",
-        allowedDependencies = {"campaign","campaign :: events", "channel","channel :: events", "contact"}
+        allowedDependencies = {"campaign", "campaign :: events", "channel", "channel :: events", "contact", "common :: security"}
 )
 package com.app.cms.analytics;
 

@@ -1,6 +1,6 @@
 @ApplicationModule(
         displayName = "Channel Management",
-        allowedDependencies = {"contact"}
+        allowedDependencies = {"contact", "common :: security"}
 )
 
 package com.app.cms.channel;
