@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Table(name = "organizations")
 @Getter
 @Setter
-@RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 public class Organization {
