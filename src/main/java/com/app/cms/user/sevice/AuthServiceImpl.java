@@ -1,10 +1,7 @@
 package com.app.cms.user.sevice;
 
 import com.app.cms.common.security.JwtService;
-import com.app.cms.user.dto.LoginResponse;
-import com.app.cms.user.dto.OrganizationDto;
-import com.app.cms.user.dto.RegisterRequest;
-import com.app.cms.user.dto.UserDto;
+import com.app.cms.user.dto.*;
 import com.app.cms.user.entity.*;
 import com.app.cms.user.mapper.OrganizationMapper;
 import com.app.cms.user.mapper.UserMapper;
@@ -16,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,6 @@ public class AuthServiceImpl {
             throw new IllegalArgumentException("Email already exists: " + request.getEmail());
         }
 
-
         Organization organization = new Organization();
         organization.setName(request.getOrganizationName());
         organization.setEmail(request.getEmail());
@@ -47,7 +45,6 @@ public class AuthServiceImpl {
 
         Organization savedOrg = organizationRepository.save(organization);
         log.info("Organization created: {} ({})", savedOrg.getName(), savedOrg.getId());
-
 
         User user = new User();
         user.setOrganization(savedOrg);
@@ -66,6 +63,41 @@ public class AuthServiceImpl {
 
         UserDto userDto = userMapper.toDto(savedUser);
         OrganizationDto orgDto = organizationMapper.toDto(savedOrg);
+
+        return new LoginResponse(token, userDto, orgDto);
+    }
+
+    @Transactional
+    public LoginResponse login(LoginRequest request) {
+        log.info("Login attempt: {}", request.getEmail());
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new IllegalArgumentException("Account is not active");
+        }
+
+
+        if (!user.getOrganization().isActive()) {
+            throw new IllegalArgumentException("Organization is suspended or cancelled");
+        }
+
+
+        user.setLastLoginAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        String token = jwtService.generateTokenPair(user);
+
+        log.info("Login successful: {}", user.getEmail());
+
+        UserDto userDto = userMapper.toDto(user);
+        OrganizationDto orgDto = organizationMapper.toDto(user.getOrganization());
 
         return new LoginResponse(token, userDto, orgDto);
     }
