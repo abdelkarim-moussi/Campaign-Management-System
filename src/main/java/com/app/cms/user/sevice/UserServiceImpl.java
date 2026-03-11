@@ -137,4 +137,37 @@ public class UserServiceImpl {
 
         return userMapper.toDto(updated);
     }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        Long currentUserId = OrganizationContext.getUserId();
+
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("Current user not found"));
+
+        if (!currentUser.canManageUsers()) {
+            throw new SecurityException("You don't have permission to delete users");
+        }
+
+        User user = userRepository.findByIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.isOwner()) {
+            throw new IllegalArgumentException("Cannot delete owner");
+        }
+
+
+        if (user.getId().equals(currentUserId)) {
+            throw new IllegalArgumentException("Cannot delete yourself");
+        }
+
+        userRepository.delete(user);
+
+        Organization org = user.getOrganization();
+        org.setCurrentUsers(org.getCurrentUsers() - 1);
+        organizationRepository.save(org);
+
+        log.info("User {} deleted from organization {}", user.getEmail(), organizationId);
+    }
 }
