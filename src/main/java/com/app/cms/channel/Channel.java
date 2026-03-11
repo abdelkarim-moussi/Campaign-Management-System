@@ -14,6 +14,8 @@ public class Channel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    @Column(nullable = false)
+    private Long organizationId;
     private ChannelType channelType;
     private boolean enabled;
 }

@@ -1,5 +1,6 @@
 package com.app.cms.template;
 
+import com.app.cms.common.security.OrganizationContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +26,9 @@ public class TemplateServiceImpl implements TemplateService {
 
         log.info("creating template {} ", dto.getName());
 
-        if(templateRepository.existsByName(dto.getName())){
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        if(templateRepository.existsByNameAndOrganizationId(dto.getName(),organizationId)){
             throw new IllegalArgumentException("Template name already exists : "+dto.getName());
         }
 
@@ -56,42 +59,51 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     public Template getTemplate(Long id){
-        return templateRepository.findById(id).
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findByIdAndOrganizationId(id,organizationId).
                 orElseThrow(() -> new TemplateNotFoundException("No Template Found With Id: "+id));
     }
 
     public List<Template> getAllTemplates(){
-        return templateRepository.findAll();
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findAllByOrganizationId(organizationId);
     }
 
     public List<Template> getTemplatesByType(TemplateType type){
-        return templateRepository.findByType(type);
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findByTypeAndOrganizationId(type,organizationId);
     }
 
     public List<Template> getTemplatesByStatus(TemplateStatus status){
-        return templateRepository.findByStatus(status);
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findByStatusAndOrganizationId(status,organizationId);
     }
 
     public List<Template> getActiveTemplates(){
-        return templateRepository.findActiveTemplates();
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findActiveTemplatesByOrganization(organizationId);
     }
 
     public List<Template> getActiveTemplatesByType(TemplateType type){
-        return templateRepository.findActiveTemplatesByType(type);
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findActiveTemplatesByTypeAndOrganization(type,organizationId);
     }
 
     public List<Template> searchTemplates(String keyword){
-        return templateRepository.searchTemplates(keyword);
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.searchTemplatesByOrganization(keyword,organizationId);
     }
 
     @Transactional
     public Template updateTemplate(Long id,TemplateDTO dto){
         log.info("updating template {}", id);
 
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         Template template = getTemplate(id);
 
         if (!template.getName().equals(dto.getName()) &&
-                templateRepository.existsByName(dto.getName())) {
+                templateRepository.existsByNameAndOrganizationId(dto.getName(),organizationId)) {
             throw new IllegalArgumentException("Template Name Already Exists " + dto.getName());
         }
 
@@ -119,9 +131,12 @@ public class TemplateServiceImpl implements TemplateService {
     public void deleteTemplate(Long id){
         log.info("deleting template with id : {}", id);
 
-        if(!templateRepository.existsById(id)){
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        if(!templateRepository.existsByIdAndOrganization(id,organizationId)){
             throw new TemplateNotFoundException("Template not Found : "+id);
         }
+
         templateRepository.deleteById(id);
     }
 
