@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +21,10 @@ import java.util.UUID;
 public class SmtpAdapter {
     private final EmailConfig emailConfig;
     private final JavaMailSender mailSender;
+
+    private static final ReentrantLock LOCK = new ReentrantLock();
+    private static long lastSendTime = 0;
+    private static final long MIN_GAP_MS = 1200;
 
     public SendResult send(EmailDto emailDto) {
         log.info("Sending email via SMTP to: {}", emailDto.getTo());
@@ -35,8 +40,23 @@ public class SmtpAdapter {
             helper.setSubject(emailDto.getSubject());
             helper.setText(emailDto.getContent(), true);  // true = HTML
 
-            // Send
-            mailSender.send(message);
+            // Rate limiting
+            LOCK.lock();
+            try {
+                long now = System.currentTimeMillis();
+                long timeSinceLast = now - lastSendTime;
+                if (timeSinceLast < MIN_GAP_MS) {
+                    long waitTime = MIN_GAP_MS - timeSinceLast;
+                    log.debug("Rate limiting SMTP: waiting {}ms", waitTime);
+                    Thread.sleep(waitTime);
+                }
+                
+                // Send
+                mailSender.send(message);
+                lastSendTime = System.currentTimeMillis();
+            } finally {
+                LOCK.unlock();
+            }
 
             // Generate Local ID
             String messageId = "mailtrap-" + UUID.randomUUID().toString();

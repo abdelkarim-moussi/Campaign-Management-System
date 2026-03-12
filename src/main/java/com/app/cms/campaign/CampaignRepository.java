@@ -22,6 +22,9 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
     @Query("SELECT c FROM Campaign c WHERE c.status = 'SCHEDULED' AND c.scheduledAt <= :now AND c.organizationId = :orgId")
     List<Campaign> findScheduledCampaignsToSendByOrganizationId(LocalDateTime now, Long orgId);
 
+    @Query("SELECT c FROM Campaign c WHERE c.status = 'SCHEDULED' AND c.scheduledAt <= :now")
+    List<Campaign> findScheduledCampaignsToSend(LocalDateTime now);
+
     @Query("SELECT c FROM Campaign c WHERE " +
             "LOWER(c.name) LIKE LOWER(CONCAT('%',:keyword,'%')) " +
             "OR LOWER(c.description) LIKE LOWER(CONCAT('%',:keyword,'%') ) " +

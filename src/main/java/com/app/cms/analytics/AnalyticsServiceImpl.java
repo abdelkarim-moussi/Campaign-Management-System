@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,15 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         Long organizationId = event.organizationId();
 
+        try {
+            updateStats(event, organizationId);
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Analytics: Race condition detected for campaign {}. Retrying update.", event.campaignId());
+            updateStats(event, organizationId);
+        }
+    }
+
+    private void updateStats(MessageSentEvent event, Long organizationId) {
         CampaignStats stats = campaignStatsRepository
                 .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
                 .orElseGet(() -> {
@@ -85,7 +95,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         }
 
         stats.calculateRates();
-
         campaignStatsRepository.save(stats);
     }
 
