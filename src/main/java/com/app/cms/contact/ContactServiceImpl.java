@@ -19,7 +19,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 
-public class ContactServiceImpl implements ContactService{
+public class ContactServiceImpl implements ContactService {
     private final ContactRepository contactRepository;
     private final TagRepository tagRepository;
     private final ApplicationEventPublisher eventPublisher;
@@ -50,8 +50,9 @@ public class ContactServiceImpl implements ContactService{
 
         dtos.forEach(dto -> {
             if (contactRepository.existsByEmail(dto.getEmail())) {
-               dtos.remove(dto);
-            };
+                dtos.remove(dto);
+            }
+            ;
 
             contacts.add(processContact(dto));
 
@@ -79,7 +80,7 @@ public class ContactServiceImpl implements ContactService{
                 .build();
 
         if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
-            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            Set<Tag> tags = new HashSet<>(tagRepository.findByIdInAndOrganizationId(dto.getTagIds(), organizationId));
             contact.setTags(tags);
         }
 
@@ -89,7 +90,7 @@ public class ContactServiceImpl implements ContactService{
     @Override
     public Contact getContact(Long contactId) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return contactRepository.findByIdAndOrganization(contactId,organizationId)
+        return contactRepository.findByIdAndOrganization(contactId, organizationId)
                 .orElseThrow(() -> new NotFoundException("contact not found"));
     }
 
@@ -102,13 +103,13 @@ public class ContactServiceImpl implements ContactService{
     @Override
     public List<Contact> getContactsByStatus(ContactStatus status) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return contactRepository.findByStatusAndOrganization(status,organizationId);
+        return contactRepository.findByStatusAndOrganization(status, organizationId);
     }
 
     @Override
     public List<Contact> searchContacts(String keyword) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return contactRepository.searchContactsByOrganization(keyword,organizationId);
+        return contactRepository.searchContactsByOrganization(keyword, organizationId);
     }
 
     @Transactional
@@ -118,8 +119,8 @@ public class ContactServiceImpl implements ContactService{
 
         Long organizationId = OrganizationContext.getOrganizationId();
 
-        Contact contact = contactRepository.findByIdAndOrganization(id,organizationId)
-                .orElseThrow(() -> new NotFoundException("Contact Not Found With id : "+id));
+        Contact contact = contactRepository.findByIdAndOrganization(id, organizationId)
+                .orElseThrow(() -> new NotFoundException("Contact Not Found With id : " + id));
 
         contact.setFirstName(dto.getFirstName());
         contact.setLastName(dto.getLastName());
@@ -129,7 +130,7 @@ public class ContactServiceImpl implements ContactService{
         contact.setCompany(dto.getCompany());
 
         if (dto.getTagIds() != null) {
-            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            Set<Tag> tags = new HashSet<>(tagRepository.findByIdInAndOrganizationId(dto.getTagIds(), organizationId));
             contact.setTags(tags);
         }
 
@@ -143,21 +144,17 @@ public class ContactServiceImpl implements ContactService{
 
         Long organizationId = OrganizationContext.getOrganizationId();
 
-        if (!contactRepository.existsByIdAndOrganization(id,organizationId)) {
+        if (!contactRepository.existsByIdAndOrganization(id, organizationId)) {
             throw new NotFoundException("Contact not found: " + id);
         }
 
-        contactRepository.deleteById(id);
+        contactRepository.deleteByIdAndOrganizationId(id, organizationId);
     }
 
     @Override
     public List<Contact> getContactsByIds(List<Long> ids) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return contactRepository.findAllById(ids)
-                .stream()
-                .filter(c -> c.getOrganizationId().equals(organizationId))
-                .toList();
+        return contactRepository.findByIdInAndOrganization(ids, organizationId);
     }
-
 
 }

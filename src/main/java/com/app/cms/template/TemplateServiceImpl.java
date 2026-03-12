@@ -22,18 +22,18 @@ public class TemplateServiceImpl implements TemplateService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public Template createTemplate(TemplateDTO dto){
+    public Template createTemplate(TemplateDTO dto) {
 
         log.info("creating template {} ", dto.getName());
 
         Long organizationId = OrganizationContext.getOrganizationId();
 
-        if(templateRepository.existsByNameAndOrganizationId(dto.getName(),organizationId)){
-            throw new IllegalArgumentException("Template name already exists : "+dto.getName());
+        if (templateRepository.existsByNameAndOrganizationId(dto.getName(), organizationId)) {
+            throw new IllegalArgumentException("Template name already exists : " + dto.getName());
         }
 
-        if(dto.getType().equals(TemplateType.EMAIL) &&
-                (dto.getSubject() == null || dto.getSubject().isEmpty())){
+        if (dto.getType().equals(TemplateType.EMAIL) &&
+                (dto.getSubject() == null || dto.getSubject().isEmpty())) {
             throw new IllegalArgumentException("Subject is required for email template");
         }
 
@@ -41,62 +41,62 @@ public class TemplateServiceImpl implements TemplateService {
         template.setOrganizationId(organizationId);
 
         List<String> extractedVars = templateProcessor.extractVariables(dto.getContent());
-        if(dto.getType().equals(TemplateType.EMAIL)){
+        if (dto.getType().equals(TemplateType.EMAIL)) {
             extractedVars.addAll(templateProcessor.extractVariables(dto.getSubject()));
         }
 
-        try{
+        try {
             template.setAvailableVariables(objectMapper.writeValueAsString(extractedVars));
-        }catch (JsonProcessingException exception){
+        } catch (JsonProcessingException exception) {
             log.error("Error Serializing variables ", exception);
             template.setAvailableVariables("[]");
         }
 
         Template saved = templateRepository.save(template);
-        log.info("Template Created With Id : {}",saved.getId());
+        log.info("Template Created With Id : {}", saved.getId());
 
         return saved;
 
     }
 
-    public Template getTemplate(Long id){
+    public Template getTemplate(Long id) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findByIdAndOrganizationId(id,organizationId).
-                orElseThrow(() -> new TemplateNotFoundException("No Template Found With Id: "+id));
+        return templateRepository.findByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new TemplateNotFoundException("No Template Found With Id: " + id));
     }
 
-    public List<Template> getAllTemplates(){
+    public List<Template> getAllTemplates() {
         Long organizationId = OrganizationContext.getOrganizationId();
         return templateRepository.findAllByOrganizationId(organizationId);
     }
 
-    public List<Template> getTemplatesByType(TemplateType type){
+    public List<Template> getTemplatesByType(TemplateType type) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findByTypeAndOrganizationId(type,organizationId);
+        return templateRepository.findByTypeAndOrganizationId(type, organizationId);
     }
 
-    public List<Template> getTemplatesByStatus(TemplateStatus status){
+    public List<Template> getTemplatesByStatus(TemplateStatus status) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findByStatusAndOrganizationId(status,organizationId);
+        return templateRepository.findByStatusAndOrganizationId(status, organizationId);
     }
 
-    public List<Template> getActiveTemplates(){
+    public List<Template> getActiveTemplates() {
         Long organizationId = OrganizationContext.getOrganizationId();
         return templateRepository.findActiveTemplatesByOrganization(organizationId);
     }
 
-    public List<Template> getActiveTemplatesByType(TemplateType type){
+    public List<Template> getActiveTemplatesByType(TemplateType type) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findActiveTemplatesByTypeAndOrganization(type,organizationId);
+        return templateRepository.findActiveTemplatesByTypeAndOrganization(type, organizationId);
     }
 
-    public List<Template> searchTemplates(String keyword){
+    public List<Template> searchTemplates(String keyword) {
         Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.searchTemplatesByOrganization(keyword,organizationId);
+        return templateRepository.searchTemplatesByOrganization(keyword, organizationId);
     }
 
     @Transactional
-    public Template updateTemplate(Long id,TemplateDTO dto){
+    public Template updateTemplate(Long id, TemplateDTO dto) {
         log.info("updating template {}", id);
 
         Long organizationId = OrganizationContext.getOrganizationId();
@@ -104,7 +104,7 @@ public class TemplateServiceImpl implements TemplateService {
         Template template = getTemplate(id);
 
         if (!template.getName().equals(dto.getName()) &&
-                templateRepository.existsByNameAndOrganizationId(dto.getName(),organizationId)) {
+                templateRepository.existsByNameAndOrganizationId(dto.getName(), organizationId)) {
             throw new IllegalArgumentException("Template Name Already Exists " + dto.getName());
         }
 
@@ -116,53 +116,53 @@ public class TemplateServiceImpl implements TemplateService {
 
         List<String> extractedVars = templateProcessor.extractVariables(dto.getContent());
 
-        if(template.getType() == TemplateType.EMAIL){
+        if (template.getType() == TemplateType.EMAIL) {
             extractedVars.addAll(templateProcessor.extractVariables(dto.getSubject()));
         }
 
-        try{
+        try {
             template.setAvailableVariables(objectMapper.writeValueAsString(extractedVars));
-        }catch (JsonProcessingException e){
-            log.error("Error Serializing variables ",e);
+        } catch (JsonProcessingException e) {
+            log.error("Error Serializing variables ", e);
         }
 
         return templateRepository.save(template);
     }
 
-    public void deleteTemplate(Long id){
+    public void deleteTemplate(Long id) {
         log.info("deleting template with id : {}", id);
 
         Long organizationId = OrganizationContext.getOrganizationId();
 
-        if(!templateRepository.existsByIdAndOrganization(id,organizationId)){
-            throw new TemplateNotFoundException("Template not Found : "+id);
+        if (!templateRepository.existsByIdAndOrganization(id, organizationId)) {
+            throw new TemplateNotFoundException("Template not Found : " + id);
         }
 
-        templateRepository.deleteById(id);
+        templateRepository.deleteByIdAndOrganizationId(id, organizationId);
     }
 
     @Transactional
-    public Template activateTemplate(Long id){
+    public Template activateTemplate(Long id) {
         Template template = getTemplate(id);
         template.setStatus(TemplateStatus.ACTIVE);
         return templateRepository.save(template);
     }
 
     @Transactional
-    public Template archiveTemplate(Long id){
+    public Template archiveTemplate(Long id) {
         Template template = getTemplate(id);
         template.setStatus(TemplateStatus.ARCHIVED);
         return templateRepository.save(template);
     }
 
-    public TemplatePreviewResult previewTemplate(Long id, Map<String,String> variables){
+    public TemplatePreviewResult previewTemplate(Long id, Map<String, String> variables) {
         Template template = getTemplate(id);
 
         String processedSubject = null;
-        String processedContent = templateProcessor.processTemplate(template.getContent(),variables);
+        String processedContent = templateProcessor.processTemplate(template.getContent(), variables);
 
-        if(template.getType().equals(TemplateType.EMAIL)){
-            processedSubject = templateProcessor.processTemplate(template.getSubject(),variables);
+        if (template.getType().equals(TemplateType.EMAIL)) {
+            processedSubject = templateProcessor.processTemplate(template.getSubject(), variables);
         }
 
         return TemplatePreviewResult.builder()
@@ -171,22 +171,21 @@ public class TemplateServiceImpl implements TemplateService {
                 .build();
     }
 
-    public List<String> getTemplateVariables(Long id){
+    public List<String> getTemplateVariables(Long id) {
         Template template = getTemplate(id);
 
-        try{
+        try {
             return objectMapper.readValue(
-                    template.getAvailableVariables()
-                    ,new TypeReference<List<String>>(){}
-            );
-        }catch (JsonProcessingException e){
-            log.error("error extracting template variables : ",e);
+                    template.getAvailableVariables(), new TypeReference<List<String>>() {
+                    });
+        } catch (JsonProcessingException e) {
+            log.error("error extracting template variables : ", e);
             return List.of();
         }
     }
 
-    public TemplatePreviewResult processTemplateForCampaign(Long templateId, Map<String,String> templateVariables){
-        return previewTemplate(templateId,templateVariables);
+    public TemplatePreviewResult processTemplateForCampaign(Long templateId, Map<String, String> templateVariables) {
+        return previewTemplate(templateId, templateVariables);
     }
 
 }

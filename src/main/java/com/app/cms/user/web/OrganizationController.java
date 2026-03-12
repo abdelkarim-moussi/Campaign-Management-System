@@ -2,14 +2,13 @@ package com.app.cms.user.web;
 
 import com.app.cms.user.dto.OrganizationDto;
 import com.app.cms.user.sevice.OrganizationService;
-import com.app.cms.user.sevice.OrganizationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/organizations")
+@RequestMapping("/api/v1/organizations")
 @RequiredArgsConstructor
 public class OrganizationController {
 
