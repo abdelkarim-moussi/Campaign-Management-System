@@ -1,6 +1,6 @@
 @ApplicationModule(
         displayName = "Template Management",
-        allowedDependencies = {}
+        allowedDependencies = {"common :: security"}
 )
 
 package com.app.cms.template;

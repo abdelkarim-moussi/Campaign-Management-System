@@ -17,6 +17,9 @@ public class MessageSent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private Long organizationId;
+    
     private Long campaignId;
 
     private Long contactId;

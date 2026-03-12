@@ -1,6 +1,6 @@
 @ApplicationModule(
         displayName = "Contact Management",
-        allowedDependencies = {"common"}
+        allowedDependencies = {"common", "common :: security"}
 )
 
 package com.app.cms.contact;

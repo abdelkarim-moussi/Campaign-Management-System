@@ -6,6 +6,7 @@ import com.app.cms.channel.events.MessageSentEvent;
 import com.app.cms.channel.internal.PostmarkAdapter;
 import com.app.cms.channel.internal.SmtpAdapter;
 import com.app.cms.channel.internal.TwilioAdapter;
+import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,7 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ChannelServiceImpl implements ChannelService{
+public class ChannelServiceImpl implements ChannelService {
     private final MessageSentRepository messageSentRepository;
     private final PostmarkAdapter postmarkAdapter;
     private final SmtpAdapter smtpAdapter;
@@ -31,19 +32,10 @@ public class ChannelServiceImpl implements ChannelService{
     public SendResult sendEmail(EmailDto emailDto) {
         log.info("Sending email to: {}", emailDto.getTo());
 
-        MessageSent message = new MessageSent();
-        message.setCampaignId(emailDto.getCampaignId());
-        message.setContactId(emailDto.getContactId());
-        message.setType(MessageType.EMAIL);
-        message.setStatus(MessageStatus.PENDING);
-        message.setRecipient(emailDto.getTo());
-        message.setSubject(emailDto.getSubject());
-        message.setContent(emailDto.getContent());
-        message.setProvider(emailConfig.getProvider().toUpperCase());
+        MessageSent message = setEmail(emailDto);
 
         MessageSent savedMessage = messageSentRepository.save(message);
 
-        // Send via provider
         SendResult result = switch (emailConfig.getProvider().toLowerCase()) {
             case "postmark" -> postmarkAdapter.send(emailDto);
             case "smtp" -> smtpAdapter.send(emailDto);
@@ -59,6 +51,7 @@ public class ChannelServiceImpl implements ChannelService{
         } else {
             savedMessage.setStatus(MessageStatus.FAILED);
             savedMessage.setErrorMessage(result.getErrorMessage());
+            savedMessage.setSentAt(LocalDateTime.now());
             log.error("Failed to send email: {}", result.getErrorMessage());
         }
 
@@ -67,30 +60,39 @@ public class ChannelServiceImpl implements ChannelService{
         // Publish Event
         eventPublisher.publishEvent(new MessageSentEvent(
                 savedMessage.getId(),
+                savedMessage.getOrganizationId(),
                 savedMessage.getCampaignId(),
                 savedMessage.getContactId(),
                 MessageType.EMAIL,
                 savedMessage.getRecipient(),
                 result.isSuccess(),
-                savedMessage.getSentAt()
-        ));
+                savedMessage.getSentAt()));
 
         result.setMessageId(savedMessage.getId());
         return result;
+    }
+
+    private MessageSent setEmail(EmailDto emailDto) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        MessageSent message = new MessageSent();
+        message.setOrganizationId(organizationId);
+        message.setCampaignId(emailDto.getCampaignId());
+        message.setContactId(emailDto.getContactId());
+        message.setType(MessageType.EMAIL);
+        message.setStatus(MessageStatus.PENDING);
+        message.setRecipient(emailDto.getTo());
+        message.setSubject(emailDto.getSubject());
+        message.setContent(emailDto.getContent());
+        message.setProvider(emailConfig.getProvider().toUpperCase());
+        return message;
     }
 
     @Transactional
     public SendResult sendSms(SmsDto smsDto) {
         log.info("Sending SMS to: {}", smsDto.getTo());
 
-        MessageSent message = new MessageSent();
-        message.setCampaignId(smsDto.getCampaignId());
-        message.setContactId(smsDto.getContactId());
-        message.setType(MessageType.SMS);
-        message.setStatus(MessageStatus.PENDING);
-        message.setRecipient(smsDto.getTo());
-        message.setContent(smsDto.getContent());
-        message.setProvider(smsConfig.getProvider().toUpperCase());
+        MessageSent message = setSms(smsDto);
 
         MessageSent savedMessage = messageSentRepository.save(message);
 
@@ -98,7 +100,6 @@ public class ChannelServiceImpl implements ChannelService{
             case "twilio" -> twilioAdapter.send(smsDto);
             default -> new SendResult(false, null, null, "Unknown SMS provider");
         };
-
 
         if (result.isSuccess()) {
             savedMessage.setStatus(MessageStatus.SENT);
@@ -113,45 +114,66 @@ public class ChannelServiceImpl implements ChannelService{
 
         messageSentRepository.save(savedMessage);
 
-
         eventPublisher.publishEvent(new MessageSentEvent(
                 savedMessage.getId(),
+                savedMessage.getOrganizationId(),
                 savedMessage.getCampaignId(),
                 savedMessage.getContactId(),
                 MessageType.SMS,
                 savedMessage.getRecipient(),
                 result.isSuccess(),
-                savedMessage.getSentAt()
-        ));
+                savedMessage.getSentAt()));
 
         result.setMessageId(savedMessage.getId());
         return result;
     }
 
+    private MessageSent setSms(SmsDto smsDto) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        MessageSent message = new MessageSent();
+        message.setOrganizationId(organizationId);
+        message.setCampaignId(smsDto.getCampaignId());
+        message.setContactId(smsDto.getContactId());
+        message.setType(MessageType.SMS);
+        message.setStatus(MessageStatus.PENDING);
+        message.setRecipient(smsDto.getTo());
+        message.setContent(smsDto.getContent());
+        message.setProvider(smsConfig.getProvider().toUpperCase());
+        return message;
+    }
 
     public MessageSent getMessage(Long id) {
-        return messageSentRepository.findById(id)
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return messageSentRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new RuntimeException("Message not found: " + id));
     }
 
-
     public List<MessageSent> getMessagesByCampaign(Long campaignId) {
-        return messageSentRepository.findByCampaignId(campaignId);
-    }
+        Long organizationId = OrganizationContext.getOrganizationId();
 
+        return messageSentRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId);
+    }
 
     public List<MessageSent> getMessagesByContact(Long contactId) {
-        return messageSentRepository.findByContactId(contactId);
-    }
+        Long organizationId = OrganizationContext.getOrganizationId();
 
+        return messageSentRepository.findByContactIdAndOrganizationId(contactId, organizationId);
+    }
 
     @Transactional
     public void updateMessageStatus(String externalId, MessageStatus newStatus) {
-        messageSentRepository.findByExternalId(externalId).ifPresent(message -> {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        messageSentRepository.findByExternalIdAndOrganizationId(externalId, organizationId).ifPresent(message -> {
             MessageStatus oldStatus = message.getStatus();
             message.setStatus(newStatus);
 
             switch (newStatus) {
+                case SENT:
+                    message.setSentAt(LocalDateTime.now());
+                    break;
                 case DELIVERED:
                     message.setDeliveredAt(LocalDateTime.now());
                     break;
@@ -160,6 +182,9 @@ public class ChannelServiceImpl implements ChannelService{
                     break;
                 case CLICKED:
                     message.setClickedAt(LocalDateTime.now());
+                    break;
+                case FAILED:
+                    message.setErrorMessage("Failed to send message");
                     break;
             }
 

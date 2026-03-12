@@ -1,6 +1,7 @@
 package com.app.cms.contact;
 
 import com.app.cms.common.NotFoundException;
+import com.app.cms.common.security.OrganizationContext;
 import com.app.cms.contact.event.ContactCreatedEvent;
 import com.app.cms.contact.exception.EmailAlreadyExistException;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 
-public class ContactServiceImpl implements ContactService{
+public class ContactServiceImpl implements ContactService {
     private final ContactRepository contactRepository;
     private final TagRepository tagRepository;
     private final ApplicationEventPublisher eventPublisher;
@@ -34,7 +35,8 @@ public class ContactServiceImpl implements ContactService{
 
         Contact savedContact = contactRepository.save(processContact(dto));
 
-        eventPublisher.publishEvent(new ContactCreatedEvent(savedContact.getId()));
+        eventPublisher
+                .publishEvent(new ContactCreatedEvent(savedContact.getId(), OrganizationContext.getOrganizationId()));
 
         log.info("Contact created with ID: {}", savedContact.getId());
         return savedContact;
@@ -49,8 +51,9 @@ public class ContactServiceImpl implements ContactService{
 
         dtos.forEach(dto -> {
             if (contactRepository.existsByEmail(dto.getEmail())) {
-               dtos.remove(dto);
-            };
+                dtos.remove(dto);
+            }
+            ;
 
             contacts.add(processContact(dto));
 
@@ -65,7 +68,10 @@ public class ContactServiceImpl implements ContactService{
     }
 
     private Contact processContact(ContactDto dto) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         Contact contact = Contact.builder()
+                .organizationId(organizationId)
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
@@ -75,7 +81,7 @@ public class ContactServiceImpl implements ContactService{
                 .build();
 
         if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
-            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            Set<Tag> tags = new HashSet<>(tagRepository.findByIdInAndOrganizationId(dto.getTagIds(), organizationId));
             contact.setTags(tags);
         }
 
@@ -83,24 +89,28 @@ public class ContactServiceImpl implements ContactService{
     }
 
     @Override
-    public Contact getContact(Long id) {
-        return contactRepository.findById(id)
+    public Contact getContact(Long contactId) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return contactRepository.findByIdAndOrganization(contactId, organizationId)
                 .orElseThrow(() -> new NotFoundException("contact not found"));
     }
 
     @Override
     public List<Contact> getAllContacts() {
-        return contactRepository.findAll();
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return contactRepository.findAllByOrganization(organizationId);
     }
 
     @Override
     public List<Contact> getContactsByStatus(ContactStatus status) {
-        return contactRepository.findByStatus(status);
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return contactRepository.findByStatusAndOrganization(status, organizationId);
     }
 
     @Override
     public List<Contact> searchContacts(String keyword) {
-        return List.of();
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return contactRepository.searchContactsByOrganization(keyword, organizationId);
     }
 
     @Transactional
@@ -108,8 +118,10 @@ public class ContactServiceImpl implements ContactService{
     public Contact updateContact(Long id, ContactDto dto) {
         log.info("Updating contact: {}", id);
 
-        Contact contact = contactRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Contact Not Found With id : "+id));
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        Contact contact = contactRepository.findByIdAndOrganization(id, organizationId)
+                .orElseThrow(() -> new NotFoundException("Contact Not Found With id : " + id));
 
         contact.setFirstName(dto.getFirstName());
         contact.setLastName(dto.getLastName());
@@ -119,7 +131,7 @@ public class ContactServiceImpl implements ContactService{
         contact.setCompany(dto.getCompany());
 
         if (dto.getTagIds() != null) {
-            Set<Tag> tags = new HashSet<>(tagRepository.findAllById(dto.getTagIds()));
+            Set<Tag> tags = new HashSet<>(tagRepository.findByIdInAndOrganizationId(dto.getTagIds(), organizationId));
             contact.setTags(tags);
         }
 
@@ -131,17 +143,19 @@ public class ContactServiceImpl implements ContactService{
     public void deleteContact(Long id) {
         log.info("Deleting contact: {}", id);
 
-        if (!contactRepository.existsById(id)) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        if (!contactRepository.existsByIdAndOrganization(id, organizationId)) {
             throw new NotFoundException("Contact not found: " + id);
         }
 
-        contactRepository.deleteById(id);
+        contactRepository.deleteByIdAndOrganizationId(id, organizationId);
     }
 
     @Override
     public List<Contact> getContactsByIds(List<Long> ids) {
-        return contactRepository.findAllById(ids);
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return contactRepository.findByIdInAndOrganization(ids, organizationId);
     }
-
 
 }

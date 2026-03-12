@@ -20,6 +20,9 @@ public class CampaignContact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private Long organizationId;
+
     @ManyToOne
     @JoinColumn(name = "campaign_id", nullable = false)
     @JsonIgnore

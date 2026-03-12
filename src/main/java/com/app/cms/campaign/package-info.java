@@ -1,6 +1,6 @@
 @ApplicationModule(
         displayName = "Campaign Management",
-        allowedDependencies = {"contact", "template", "channel"}
+        allowedDependencies = {"contact", "template", "channel", "common :: security"}
 )
 package com.app.cms.campaign;
 

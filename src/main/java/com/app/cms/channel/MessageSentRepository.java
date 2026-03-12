@@ -8,17 +8,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MessageSentRepository extends JpaRepository<MessageSent,Long> {
-    List<MessageSent> findByCampaignId(Long campaignId);
 
-    List<MessageSent> findByContactId(Long contactId);
+    List<MessageSent> findByCampaignIdAndOrganizationId(Long campaignId,Long orgId);
 
-    List<MessageSent> findByStatus(MessageStatus status);
+    Optional<MessageSent> findByIdAndOrganizationId(Long campaignId, Long orgId);
 
-    List<MessageSent> findByType(MessageType type);
+    List<MessageSent> findByContactIdAndOrganizationId(Long contactId, Long orgId);
 
-    List<MessageSent> findByCampaignIdAndStatus(Long campaignId, MessageStatus status);
-
-    Optional<MessageSent> findByExternalId(String externalId);
+    Optional<MessageSent> findByExternalIdAndOrganizationId(String externalId, Long orgId);
 
     @Query("SELECT COUNT(m) FROM MessageSent m WHERE m.campaignId = :campaignId")
     int countByCampaignId(Long campaignId);

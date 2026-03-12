@@ -24,6 +24,9 @@ public class Template {
     private Long id;
 
     @Column(nullable = false)
+    private Long organizationId;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(length = 1000)

@@ -1,5 +1,6 @@
 package com.app.cms.campaign;
 
+import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,9 +20,11 @@ public class CampaignScheduler {
     public void checkScheduledCampaigns() {
         log.debug("Checking for scheduled campaigns to send...");
 
+        Long organizationId = OrganizationContext.getOrganizationId();
+
         LocalDateTime now = LocalDateTime.now();
         List<Campaign> campaignsToSend =
-                campaignRepository.findScheduledCampaignsToSend(now);
+                campaignRepository.findScheduledCampaignsToSendByOrganizationId(now,organizationId);
 
         if (!campaignsToSend.isEmpty()) {
             log.info("Found {} campaigns to send", campaignsToSend.size());

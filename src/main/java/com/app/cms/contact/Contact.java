@@ -24,6 +24,9 @@ public class Contact {
     private Long id;
 
     @Column(nullable = false)
+    private Long organizationId;
+
+    @Column(nullable = false)
     private String firstName;
 
     @Column(nullable = false)

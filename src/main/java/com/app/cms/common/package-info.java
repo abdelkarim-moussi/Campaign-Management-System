@@ -1,7 +1,7 @@
 
 @ApplicationModule(
         displayName = "Commons",
-        allowedDependencies = {}
+        allowedDependencies = {"user", "user :: repositories", "user :: entities"}
 )
 
 package com.app.cms.common;
