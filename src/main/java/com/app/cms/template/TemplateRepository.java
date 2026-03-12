@@ -28,10 +28,11 @@ public interface TemplateRepository extends JpaRepository<Template,Long> {
     @Query("SELECT t FROM Template t WHERE " +
             "LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%') ) OR " +
             "LOWER(t.description) LIKE LOWER(CONCAT('%',:keyword, '%') ) " +
-            "HAVING t.organizationId=:orgId")
+            "AND t.organizationId=:orgId")
     List<Template> searchTemplatesByOrganization(String keyword,Long orgId);
 
-    @Query("SELECT t from Template t WHERE t.status = 'ACTIVE' AND t.type = :type AND t.organizationId=:orgId")
+    @Query("SELECT t from Template t WHERE t.status = 'ACTIVE' AND t.type = :type " +
+            "AND t.organizationId=:orgId")
     List<Template> findActiveTemplatesByTypeAndOrganization(TemplateType type,Long orgId);
 
     @Query("SELECT t from Template t WHERE t.status = 'ACTIVE' AND t.organizationId=:orgId")

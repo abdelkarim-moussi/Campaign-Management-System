@@ -19,7 +19,8 @@ public interface CampaignContactRepository extends JpaRepository<CampaignContact
 
     boolean existsByCampaignIdAndContactIdAndOrganizationId(Long campaignId, Long contactId, Long orgId);
 
-    @Query("SELECT COUNT(cc) FROM CampaignContact cc WHERE cc.campaign.id = :campaignId")
+    @Query("SELECT COUNT(cc) FROM CampaignContact cc WHERE cc.campaign.id = :campaignId" +
+            " AND cc.organizationId = :orgId")
     int countByCampaignIdAndOrganizationId(Long campaignId,Long orgId);
 
     @Query("SELECT COUNT(cc) FROM CampaignContact cc WHERE " +

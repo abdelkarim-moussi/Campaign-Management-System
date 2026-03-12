@@ -38,6 +38,7 @@ public class TemplateServiceImpl implements TemplateService {
         }
 
         Template template = mapper.toEntity(dto);
+        template.setOrganizationId(organizationId);
 
         List<String> extractedVars = templateProcessor.extractVariables(dto.getContent());
         if(dto.getType().equals(TemplateType.EMAIL)){

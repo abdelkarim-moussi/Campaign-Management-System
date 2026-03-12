@@ -23,7 +23,7 @@ public interface CampaignRepository extends JpaRepository<Campaign,Long> {
     @Query("SELECT c FROM Campaign c WHERE " +
             "LOWER(c.name) LIKE LOWER(CONCAT('%',:keyword,'%')) " +
             "OR LOWER(c.description) LIKE LOWER(CONCAT('%',:keyword,'%') ) " +
-            "HAVING c.organizationId = :orgId")
+            "AND c.organizationId = :orgId")
     List<Campaign> searchCampaignsByOrganizationId(String keyword, Long orgId);
 
     boolean existsByNameAndOrganizationId(String name, Long orgId);

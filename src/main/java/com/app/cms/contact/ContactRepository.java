@@ -14,25 +14,25 @@ public interface ContactRepository extends JpaRepository<Contact,Long> {
 
     boolean existsByEmail(String email);
 
-    @Query("SELECT c FROM Contact c JOIN c.tags t WHERE t.id IN :tagIds")
-    List<Contact> findByTagIds(List<Long> tagIds);
+    @Query("SELECT c FROM Contact c JOIN c.tags t WHERE t.id IN :tagIds AND t.organizationId = :orgId")
+    List<Contact> findByTagIdsAndOrganizationId(List<Long> tagIds, Long orgId);
 
     @Query("SELECT c FROM Contact c WHERE " +
             "LOWER(c.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(c.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "HAVING c.organizationId =:orgId")
+            "AND c.organizationId =:orgId")
     List<Contact> searchContactsByOrganization(String keyword,Long orgId);
 
     @Query("SELECT c FROM Contact c WHERE c.organizationId = :orgId")
-    List<Contact> findAllByOrganization(@Param("orgId") Long organizationId);
+    List<Contact> findAllByOrganization(@Param("orgId") Long orgId);
 
     @Query("SELECT c FROM Contact c WHERE c.id = :id AND c.organizationId = :orgId")
     Optional<Contact> findByIdAndOrganization(@Param("id") Long id,
-                                              @Param("orgId") Long organizationId);
+                                              @Param("orgId") Long orgId);
 
     @Query("SELECT c FROM Contact c WHERE c.organizationId = :orgId AND c.status = :status")
     List<Contact> findByStatusAndOrganization(@Param("status") ContactStatus status,
-                                              @Param("orgId") Long organizationId);
+                                              @Param("orgId") Long orgId);
     
 }
