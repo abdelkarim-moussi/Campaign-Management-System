@@ -21,6 +21,9 @@ public class WorkflowExecution {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "organization_id", nullable = false)
+    private Long organizationId;
+
     @ManyToOne
     @JoinColumn(name = "workflow_id", nullable = false)
     private Workflow workflow;
