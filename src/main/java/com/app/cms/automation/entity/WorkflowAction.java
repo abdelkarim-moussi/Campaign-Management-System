@@ -15,8 +15,27 @@ public class WorkflowAction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "workflow_id", nullable = false)
+    private Workflow workflow;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Long organizationId;
-    private String actionType;
-    private int delay;
+    private ActionType type;
+
+    @Column(nullable = false)
+    private Integer orderIndex;
+
+    private Integer delayHours;
+
+    @Column(columnDefinition = "TEXT")
+    private String actionParams;
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
+
+    public boolean isWaitAction() {
+        return this.type == ActionType.WAIT;
+    }
 }
