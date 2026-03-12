@@ -53,4 +53,49 @@ public class WorkflowExecutionService {
         return saved;
     }
 
+    @Async
+    @Transactional
+    public void executeNextAction(WorkflowExecution execution) {
+        try {
+            List<WorkflowAction> actions = execution.getWorkflow().getActions();
+
+            if (execution.getCurrentActionIndex() >= actions.size()) {
+                completeExecution(execution, true);
+                return;
+            }
+
+            WorkflowAction action = actions.get(execution.getCurrentActionIndex());
+
+            log.info("🔄 Executing action {} ({}) for execution {}",
+                    execution.getCurrentActionIndex() + 1,
+                    action.getType(),
+                    execution.getId());
+
+            if (action.isWaitAction()) {
+                handleWaitAction(execution, action);
+                return;
+            }
+
+            boolean success = performAction(execution, action);
+
+            logAction(execution, action, success, null);
+
+            if (!success) {
+                completeExecution(execution, false);
+                return;
+            }
+
+
+            execution.setCurrentActionIndex(execution.getCurrentActionIndex() + 1);
+            executionRepository.save(execution);
+
+            executeNextAction(execution);
+
+        } catch (Exception e) {
+            log.error("Error executing workflow: {}", e.getMessage(), e);
+            execution.setErrorMessage(e.getMessage());
+            completeExecution(execution, false);
+        }
+    }
+
 }
