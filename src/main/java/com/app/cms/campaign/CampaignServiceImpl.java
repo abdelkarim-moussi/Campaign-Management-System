@@ -95,6 +95,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         eventPublisher.publishEvent(new CampaignCreatedEvent(
                 savedCampaign.getId(),
+                organizationId,
                 savedCampaign.getName(),
                 savedCampaign.getCreatedAt()));
 
@@ -274,6 +275,11 @@ public class CampaignServiceImpl implements CampaignService {
                             processed.getContent(),
                             null,
                             null);
+                    try {
+                        Thread.sleep(1100);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     result = channelService.sendEmail(emailDto);
 
                 } else if (campaign.getChannel() == CampaignChannel.SMS) {
@@ -318,6 +324,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         eventPublisher.publishEvent(new CampaignSentEvent(
                 campaign.getId(),
+                organizationId,
                 campaign.getName(),
                 campaign.getChannel(),
                 campaignContacts.size(),

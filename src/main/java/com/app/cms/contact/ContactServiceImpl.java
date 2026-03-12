@@ -35,7 +35,8 @@ public class ContactServiceImpl implements ContactService {
 
         Contact savedContact = contactRepository.save(processContact(dto));
 
-        eventPublisher.publishEvent(new ContactCreatedEvent(savedContact.getId()));
+        eventPublisher
+                .publishEvent(new ContactCreatedEvent(savedContact.getId(), OrganizationContext.getOrganizationId()));
 
         log.info("Contact created with ID: {}", savedContact.getId());
         return savedContact;

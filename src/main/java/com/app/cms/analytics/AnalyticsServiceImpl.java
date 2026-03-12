@@ -23,7 +23,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     public void onCampaignSent(CampaignSentEvent event) {
         log.info("Analytics: Campaign sent event received for campaign {}", event.campaignId());
 
-        Long organizationId = OrganizationContext.getOrganizationId();
+        Long organizationId = event.organizationId();
 
         CampaignStats stats = campaignStatsRepository
                 .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
@@ -47,7 +47,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     public void onMessageSent(MessageSentEvent event) {
         log.debug("Analytics: Message sent event received for message {}", event.messageId());
 
-        Long organizationId = OrganizationContext.getOrganizationId();
+        Long organizationId = event.organizationId();
 
         CampaignStats stats = campaignStatsRepository
                 .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)

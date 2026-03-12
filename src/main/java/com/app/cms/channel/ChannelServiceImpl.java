@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ChannelServiceImpl implements ChannelService{
+public class ChannelServiceImpl implements ChannelService {
     private final MessageSentRepository messageSentRepository;
     private final PostmarkAdapter postmarkAdapter;
     private final SmtpAdapter smtpAdapter;
@@ -60,13 +60,13 @@ public class ChannelServiceImpl implements ChannelService{
         // Publish Event
         eventPublisher.publishEvent(new MessageSentEvent(
                 savedMessage.getId(),
+                savedMessage.getOrganizationId(),
                 savedMessage.getCampaignId(),
                 savedMessage.getContactId(),
                 MessageType.EMAIL,
                 savedMessage.getRecipient(),
                 result.isSuccess(),
-                savedMessage.getSentAt()
-        ));
+                savedMessage.getSentAt()));
 
         result.setMessageId(savedMessage.getId());
         return result;
@@ -101,7 +101,6 @@ public class ChannelServiceImpl implements ChannelService{
             default -> new SendResult(false, null, null, "Unknown SMS provider");
         };
 
-
         if (result.isSuccess()) {
             savedMessage.setStatus(MessageStatus.SENT);
             savedMessage.setExternalId(result.getExternalId());
@@ -115,16 +114,15 @@ public class ChannelServiceImpl implements ChannelService{
 
         messageSentRepository.save(savedMessage);
 
-
         eventPublisher.publishEvent(new MessageSentEvent(
                 savedMessage.getId(),
+                savedMessage.getOrganizationId(),
                 savedMessage.getCampaignId(),
                 savedMessage.getContactId(),
                 MessageType.SMS,
                 savedMessage.getRecipient(),
                 result.isSuccess(),
-                savedMessage.getSentAt()
-        ));
+                savedMessage.getSentAt()));
 
         result.setMessageId(savedMessage.getId());
         return result;
@@ -145,28 +143,24 @@ public class ChannelServiceImpl implements ChannelService{
         return message;
     }
 
-
     public MessageSent getMessage(Long id) {
         Long organizationId = OrganizationContext.getOrganizationId();
 
-        return messageSentRepository.findByIdAndOrganizationId(id,organizationId)
+        return messageSentRepository.findByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new RuntimeException("Message not found: " + id));
     }
-
 
     public List<MessageSent> getMessagesByCampaign(Long campaignId) {
         Long organizationId = OrganizationContext.getOrganizationId();
 
-        return messageSentRepository.findByCampaignIdAndOrganizationId(campaignId,organizationId);
+        return messageSentRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId);
     }
-
 
     public List<MessageSent> getMessagesByContact(Long contactId) {
         Long organizationId = OrganizationContext.getOrganizationId();
 
         return messageSentRepository.findByContactIdAndOrganizationId(contactId, organizationId);
     }
-
 
     @Transactional
     public void updateMessageStatus(String externalId, MessageStatus newStatus) {
@@ -177,6 +171,9 @@ public class ChannelServiceImpl implements ChannelService{
             message.setStatus(newStatus);
 
             switch (newStatus) {
+                case SENT:
+                    message.setSentAt(LocalDateTime.now());
+                    break;
                 case DELIVERED:
                     message.setDeliveredAt(LocalDateTime.now());
                     break;
@@ -185,6 +182,9 @@ public class ChannelServiceImpl implements ChannelService{
                     break;
                 case CLICKED:
                     message.setClickedAt(LocalDateTime.now());
+                    break;
+                case FAILED:
+                    message.setErrorMessage("Failed to send message");
                     break;
             }
 
