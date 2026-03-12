@@ -1,4 +1,4 @@
-package com.app.cms.automation;
+package com.app.cms.automation.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
