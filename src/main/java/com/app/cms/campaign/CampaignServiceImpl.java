@@ -63,6 +63,7 @@ public class CampaignServiceImpl implements CampaignService {
         }
 
         Campaign campaign = new Campaign();
+        campaign.setOrganizationId(organizationId);
         campaign.setName(dto.getName());
         campaign.setDescription(dto.getDescription());
         campaign.setObjective(dto.getObjective());
@@ -80,6 +81,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         for (Contact contact : contacts) {
             CampaignContact cc = new CampaignContact();
+            cc.setOrganizationId(organizationId);
             cc.setCampaign(savedCampaign);
             cc.setContact(contact);
             cc.setStatus(MessageStatus.PENDING);
@@ -190,6 +192,7 @@ public class CampaignServiceImpl implements CampaignService {
             if (!campaignContactRepository.existsByCampaignIdAndContactIdAndOrganizationId(campaignId, contact.getId(),
                     organizationId)) {
                 CampaignContact cc = CampaignContact.builder()
+                        .organizationId(organizationId)
                         .campaign(campaign)
                         .contact(contact)
                         .status(MessageStatus.PENDING)

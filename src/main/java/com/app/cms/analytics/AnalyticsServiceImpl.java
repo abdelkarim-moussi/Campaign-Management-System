@@ -26,12 +26,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         Long organizationId = OrganizationContext.getOrganizationId();
 
         CampaignStats stats = campaignStatsRepository
-                .findByCampaignIdAndOrganizationId(event.campaignId(),organizationId)
+                .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
                 .orElse(new CampaignStats());
 
         stats.setCampaignId(event.campaignId());
         stats.setCampaignName(event.campaignName());
         stats.setTotalRecipients(event.totalRecipients());
+        stats.setOrganizationId(organizationId);
 
         if (stats.getFirstSentAt() == null) {
             stats.setFirstSentAt(event.sentAt());
@@ -49,10 +50,11 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         Long organizationId = OrganizationContext.getOrganizationId();
 
         CampaignStats stats = campaignStatsRepository
-                .findByCampaignIdAndOrganizationId(event.campaignId(),organizationId)
+                .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
                 .orElseGet(() -> {
                     CampaignStats newStats = new CampaignStats();
                     newStats.setCampaignId(event.campaignId());
+                    newStats.setOrganizationId(organizationId);
                     return newStats;
                 });
 
@@ -61,6 +63,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             stats.setTotalDelivered(stats.getTotalDelivered() + 1);
 
             MessageTracking tracking = new MessageTracking();
+            tracking.setOrganizationId(organizationId);
             tracking.setMessageId(event.messageId());
             tracking.setCampaignId(event.campaignId());
             tracking.setContactId(event.contactId());
@@ -69,6 +72,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             messageTrackingRepository.save(tracking);
 
             MessageTracking deliveryTracking = new MessageTracking();
+            deliveryTracking.setOrganizationId(organizationId);
             deliveryTracking.setMessageId(event.messageId());
             deliveryTracking.setCampaignId(event.campaignId());
             deliveryTracking.setContactId(event.contactId());
@@ -85,27 +89,27 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         campaignStatsRepository.save(stats);
     }
 
-
     @Transactional
     public void trackEvent(Long messageId, Long campaignId, Long contactId,
-                           TrackingEventType eventType, String metadata) {
+            TrackingEventType eventType, String metadata) {
         log.info("Tracking event: {} for message {}", eventType, messageId);
 
         Long organizationId = OrganizationContext.getOrganizationId();
 
-        if (messageTrackingRepository.existsByMessageIdAndEventTypeAndOrganizationId(messageId, eventType, organizationId)) {
+        if (messageTrackingRepository.existsByMessageIdAndEventTypeAndOrganizationId(messageId, eventType,
+                organizationId)) {
             log.debug("Event {} already tracked for message {}", eventType, messageId);
             return;
         }
 
         MessageTracking tracking = new MessageTracking();
+        tracking.setOrganizationId(organizationId);
         tracking.setMessageId(messageId);
         tracking.setCampaignId(campaignId);
         tracking.setContactId(contactId);
         tracking.setEventType(eventType);
         tracking.setEventAt(LocalDateTime.now());
         messageTrackingRepository.save(tracking);
-
 
         campaignStatsRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId).ifPresent(stats -> {
             switch (eventType) {
@@ -131,7 +135,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         });
     }
 
-
     public CampaignStatsDto getCampaignStats(Long campaignId) {
 
         Long organizationId = OrganizationContext.getOrganizationId();
@@ -152,10 +155,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 stats.getClickRate(),
                 stats.getDeliveryRate(),
                 stats.getFirstSentAt(),
-                stats.getLastUpdatedAt()
-        );
+                stats.getLastUpdatedAt());
     }
-
 
     public List<CampaignStats> getAllCampaignStats() {
 
@@ -164,14 +165,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return campaignStatsRepository.findRecentCampaignsByOrganizationId(organizationId);
     }
 
-
     public List<CampaignStats> getTopPerformingCampaigns() {
 
         Long organizationId = OrganizationContext.getOrganizationId();
 
         return campaignStatsRepository.findTopPerformingCampaignsByOrganizationId(organizationId);
     }
-
 
     public List<MessageTracking> getMessageTracking(Long messageId) {
 
