@@ -2,10 +2,8 @@ package com.app.cms.automation.service;
 
 import com.app.cms.automation.dto.WorkflowActionDto;
 import com.app.cms.automation.dto.WorkflowDto;
-import com.app.cms.automation.entity.Workflow;
-import com.app.cms.automation.entity.WorkflowAction;
-import com.app.cms.automation.entity.WorkflowExecution;
-import com.app.cms.automation.entity.WorkflowStatus;
+import com.app.cms.automation.dto.WorkflowStatsDto;
+import com.app.cms.automation.entity.*;
 import com.app.cms.automation.repository.WorkflowActionRepository;
 import com.app.cms.automation.repository.WorkflowExecutionRepository;
 import com.app.cms.automation.repository.WorkflowLogRepository;
@@ -116,6 +114,34 @@ public class WorkflowServiceImpl {
     public List<WorkflowExecution> getWorkflowExecutions(Long workflowId) {
         getWorkflow(workflowId);
         return executionRepository.findByWorkflowId(workflowId);
+    }
+
+    public List<WorkflowLog> getExecutionLogs(Long executionId) {
+        return logRepository.findByExecutionIdOrderByExecutedAtAsc(executionId);
+    }
+
+
+    public WorkflowStatsDto getWorkflowStats(Long workflowId) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        Workflow workflow = getWorkflow(workflowId);
+
+        int activeExecutions = (int) executionRepository.findByWorkflowId(workflowId)
+                .stream()
+                .filter(e -> e.getStatus() == ExecutionStatus.RUNNING ||
+                        e.getStatus() == ExecutionStatus.WAITING)
+                .count();
+
+        return new WorkflowStatsDto(
+                workflow.getId(),
+                workflow.getName(),
+                workflow.getStatus(),
+                workflow.getTotalExecutions(),
+                workflow.getSuccessfulExecutions(),
+                workflow.getFailedExecutions(),
+                workflow.getSuccessRate(),
+                activeExecutions,
+                workflow.getCreatedAt()
+        );
     }
 
 

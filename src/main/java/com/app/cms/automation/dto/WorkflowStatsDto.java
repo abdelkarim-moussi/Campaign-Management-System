@@ -1,11 +1,15 @@
 package com.app.cms.automation.dto;
 
 import com.app.cms.automation.entity.WorkflowStatus;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class WorkflowStatsDto {
     private Long workflowId;
     private String workflowName;
