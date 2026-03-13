@@ -4,6 +4,7 @@ import com.app.cms.automation.dto.WorkflowActionDto;
 import com.app.cms.automation.dto.WorkflowDto;
 import com.app.cms.automation.entity.Workflow;
 import com.app.cms.automation.entity.WorkflowAction;
+import com.app.cms.automation.entity.WorkflowExecution;
 import com.app.cms.automation.entity.WorkflowStatus;
 import com.app.cms.automation.repository.WorkflowActionRepository;
 import com.app.cms.automation.repository.WorkflowExecutionRepository;
@@ -104,4 +105,18 @@ public class WorkflowServiceImpl {
         log.info("Workflow '{}' deactivated", workflow.getName());
         return workflowRepository.save(workflow);
     }
+
+    public void deleteWorkflow(Long id) {
+        Workflow workflow = getWorkflow(id);
+        workflowRepository.delete(workflow);
+
+        log.info("Workflow '{}' deleted", workflow.getName());
+    }
+
+    public List<WorkflowExecution> getWorkflowExecutions(Long workflowId) {
+        getWorkflow(workflowId);
+        return executionRepository.findByWorkflowId(workflowId);
+    }
+
+
 }
