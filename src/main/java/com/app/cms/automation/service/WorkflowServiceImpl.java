@@ -81,4 +81,27 @@ public class WorkflowServiceImpl {
         Long organizationId = OrganizationContext.getOrganizationId();
         return workflowRepository.findByOrganizationIdAndStatus(organizationId,WorkflowStatus.ACTIVE);
     }
+
+
+    public Workflow activateWorkflow(Long id) {
+        Workflow workflow = getWorkflow(id);
+        if(workflow.isActive()){{
+            log.error("Workflow '{}' is Already Active", workflow.getName());
+            throw new RuntimeException("Workflow is Already Active "+workflow.getName());
+        }}
+        workflow.setStatus(WorkflowStatus.ACTIVE);
+        log.info("Workflow '{}' activated", workflow.getName());
+        return workflowRepository.save(workflow);
+    }
+
+    public Workflow deactivateWorkflow(Long id) {
+        Workflow workflow = getWorkflow(id);
+        if(!workflow.isActive()){{
+            log.error("Workflow '{}' is Already Deactivated", workflow.getName());
+            throw new RuntimeException("Workflow is Already deactivated "+workflow.getName());
+        }}
+        workflow.setStatus(WorkflowStatus.INACTIVE);
+        log.info("Workflow '{}' deactivated", workflow.getName());
+        return workflowRepository.save(workflow);
+    }
 }
