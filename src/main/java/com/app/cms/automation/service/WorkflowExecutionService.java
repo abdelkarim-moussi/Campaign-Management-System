@@ -1,9 +1,6 @@
 package com.app.cms.automation.service;
 
-import com.app.cms.automation.entity.ExecutionStatus;
-import com.app.cms.automation.entity.Workflow;
-import com.app.cms.automation.entity.WorkflowAction;
-import com.app.cms.automation.entity.WorkflowExecution;
+import com.app.cms.automation.entity.*;
 import com.app.cms.automation.repository.WorkflowExecutionRepository;
 import com.app.cms.automation.repository.WorkflowLogRepository;
 import com.app.cms.channel.ChannelService;
@@ -72,7 +69,7 @@ public class WorkflowExecutionService {
 
             WorkflowAction action = actions.get(execution.getCurrentActionIndex());
 
-            log.info("🔄 Executing action {} ({}) for execution {}",
+            log.info("Executing action {} ({}) for execution {}",
                     execution.getCurrentActionIndex() + 1,
                     action.getType(),
                     execution.getId());
@@ -91,7 +88,6 @@ public class WorkflowExecutionService {
                 return;
             }
 
-
             execution.setCurrentActionIndex(execution.getCurrentActionIndex() + 1);
             executionRepository.save(execution);
 
@@ -106,7 +102,7 @@ public class WorkflowExecutionService {
 
     @Transactional
     protected void handleWaitAction(WorkflowExecution execution, WorkflowAction action) {
-        log.info("⏰ Waiting {} hours before next action", action.getDelayHours());
+        log.info("Waiting {} hours before next action", action.getDelayHours());
 
         execution.setStatus(ExecutionStatus.WAITING);
         execution.setResumeAt(LocalDateTime.now().plusHours(action.getDelayHours()));
@@ -200,5 +196,57 @@ public class WorkflowExecutionService {
         contactService.updateContact(contact.getId(), null);  // Simplifier pour MVP
         log.info("Changed status of contact {} to {}", contact.getId(), newStatus);
         return true;
+    }
+
+    @Transactional
+    protected void completeExecution(WorkflowExecution execution, boolean success) {
+        execution.setStatus(success ? ExecutionStatus.COMPLETED : ExecutionStatus.FAILED);
+        execution.setCompletedAt(LocalDateTime.now());
+        executionRepository.save(execution);
+
+        Workflow workflow = execution.getWorkflow();
+        if (success) {
+            workflow.incrementSuccessful();
+        } else {
+            workflow.incrementFailed();
+        }
+
+        log.info("Workflow execution {} completed with status: {}",
+                execution.getId(), execution.getStatus());
+    }
+
+
+    private void logAction(WorkflowExecution execution, WorkflowAction action,
+                           boolean success, String details) {
+        WorkflowLog log = new WorkflowLog();
+        log.setExecution(execution);
+        log.setActionIndex(execution.getCurrentActionIndex());
+        log.setActionType(action.getType().toString());
+        log.setDescription(buildDescription(action, execution.getContact()));
+        log.setSuccess(success);
+        log.setErrorDetails(details);
+
+        logRepository.save(log);
+    }
+
+    private String buildDescription(WorkflowAction action, Contact contact) {
+        return switch (action.getType()) {
+            case SEND_EMAIL -> "Email envoyé à " + contact.getEmail();
+            case SEND_SMS -> "SMS envoyé à " + contact.getPhone();
+            case CHANGE_STATUS -> "Statut changé pour le contact";
+            case WAIT -> "En attente de " + action.getDelayHours() + " heures";
+        };
+    }
+
+    private Map<String, Object> parseActionParams(String json) {
+        try {
+            if (json == null || json.isEmpty()) {
+                return new HashMap<>();
+            }
+            return objectMapper.readValue(json, Map.class);
+        } catch (Exception e) {
+            log.error("Error parsing action params: {}", e.getMessage());
+            return new HashMap<>();
+        }
     }
 }

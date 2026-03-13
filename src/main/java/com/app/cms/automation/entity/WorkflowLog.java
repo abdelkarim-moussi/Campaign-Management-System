@@ -1,11 +1,19 @@
 package com.app.cms.automation.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "workflow_logs")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class WorkflowLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
