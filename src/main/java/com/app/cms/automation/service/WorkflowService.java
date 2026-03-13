@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface WorkflowService {
     Workflow createWorkflow(WorkflowDto dto);
+    Workflow updateWorkflow(Long id, WorkflowDto dto);
     Workflow getWorkflow(Long id);
     List<Workflow> getAllWorkflows();
     List<Workflow> getActiveWorkflows();

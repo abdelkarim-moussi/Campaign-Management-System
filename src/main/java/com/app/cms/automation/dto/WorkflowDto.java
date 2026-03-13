@@ -17,7 +17,7 @@ public class WorkflowDto {
     @NotNull(message = "Trigger type is required")
     private WorkflowTriggerType triggerType;
 
-    private String triggerParams;  // JSON
+    private String triggerParams;
 
     @NotNull(message = "Actions are required")
     private List<WorkflowActionDto> actions;

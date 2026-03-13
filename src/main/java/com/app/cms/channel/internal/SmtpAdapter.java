@@ -7,13 +7,10 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
-import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Component
 @RequiredArgsConstructor
@@ -22,51 +19,52 @@ public class SmtpAdapter {
     private final EmailConfig emailConfig;
     private final JavaMailSender mailSender;
 
-    private static final ReentrantLock LOCK = new ReentrantLock();
-    private static long lastSendTime = 0;
-    private static final long MIN_GAP_MS = 1200;
-
     public SendResult send(EmailDto emailDto) {
-        log.info("Sending email via SMTP to: {}", emailDto.getTo());
+        int maxRetries = 3;
+        int retryCount = 0;
+        int delayMs = 2000;
 
-        try {
-
-            // Create message
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom(emailConfig.getFromEmail(), emailConfig.getFromName());
-            helper.setTo(emailDto.getTo());
-            helper.setSubject(emailDto.getSubject());
-            helper.setText(emailDto.getContent(), true);  // true = HTML
-
-            // Rate limiting
-            LOCK.lock();
+        while (retryCount < maxRetries) {
             try {
-                long now = System.currentTimeMillis();
-                long timeSinceLast = now - lastSendTime;
-                if (timeSinceLast < MIN_GAP_MS) {
-                    long waitTime = MIN_GAP_MS - timeSinceLast;
-                    log.debug("Rate limiting SMTP: waiting {}ms", waitTime);
-                    Thread.sleep(waitTime);
+                log.info("Sending email via SMTP to: {} (Attempt {})", emailDto.getTo(), retryCount + 1);
+
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+                helper.setFrom(emailConfig.getFromEmail(), emailConfig.getFromName());
+                helper.setTo(emailDto.getTo());
+                helper.setSubject(emailDto.getSubject());
+                helper.setText(emailDto.getContent(), true);
+
+                mailSender.send(message);
+
+                String messageId = "mailtrap-" + UUID.randomUUID().toString();
+                log.info("Email sent successfully via SMTP. MessageID: {}", messageId);
+                return new SendResult(true, null, messageId, null);
+
+            } catch (Exception e) {
+                String errorMsg = e.getMessage();
+                log.warn("Attempt {} failed to send email to {}: {}", retryCount + 1, emailDto.getTo(), errorMsg);
+
+                if (errorMsg != null && errorMsg.contains("Too many emails per second")) {
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        log.info("Rate limit hit. Retrying in {}ms...", delayMs);
+                        try {
+                            Thread.sleep(delayMs);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            return new SendResult(false, null, null, "Interrupted during retry delay");
+                        }
+                        delayMs *= 2; // Exponential backoff
+                        continue;
+                    }
                 }
                 
-                // Send
-                mailSender.send(message);
-                lastSendTime = System.currentTimeMillis();
-            } finally {
-                LOCK.unlock();
+                log.error("Failed to send email via SMTP after {} attempts: {}", retryCount + 1, errorMsg, e);
+                return new SendResult(false, null, null, errorMsg);
             }
-
-            // Generate Local ID
-            String messageId = "mailtrap-" + UUID.randomUUID().toString();
-
-            log.info("Email sent successfully via SMTP. MessageID: {}", messageId);
-            return new SendResult(true, null, messageId, null);
-
-        } catch (Exception e) {
-            log.error("Failed to send email via SMTP: {}", e.getMessage(), e);
-            return new SendResult(false, null, null, e.getMessage());
         }
+        return new SendResult(false, null, null, "Max retries exceeded for email delivery");
     }
 }

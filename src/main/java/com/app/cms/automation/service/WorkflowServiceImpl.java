@@ -39,11 +39,14 @@ public class WorkflowServiceImpl implements WorkflowService {
     public Workflow createWorkflow(WorkflowDto dto) {
         log.info("Creating workflow: {}", dto.getName());
 
-        if (workflowRepository.existsByName(dto.getName())) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        if (workflowRepository.existsByNameAndOrganizationId(dto.getName(),organizationId)) {
             throw new IllegalArgumentException("Workflow name already exists: " + dto.getName());
         }
 
         Workflow workflow = new Workflow();
+        workflow.setOrganizationId(organizationId);
         workflow.setName(dto.getName());
         workflow.setDescription(dto.getDescription());
         workflow.setTriggerType(dto.getTriggerType());
@@ -65,6 +68,31 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         log.info("Workflow created with {} actions", dto.getActions().size());
         return saved;
+    }
+
+    @Transactional
+    public Workflow updateWorkflow(Long id, WorkflowDto dto) {
+        log.info("Updating workflow: {}", id);
+        Workflow workflow = getWorkflow(id);
+
+        workflow.setName(dto.getName());
+        workflow.setDescription(dto.getDescription());
+        workflow.setTriggerType(dto.getTriggerType());
+        workflow.setTriggerParams(dto.getTriggerParams());
+
+        actionRepository.deleteByWorkflowId(id);
+        
+        for (WorkflowActionDto actionDto : dto.getActions()) {
+            WorkflowAction action = new WorkflowAction();
+            action.setWorkflow(workflow);
+            action.setType(actionDto.getType());
+            action.setOrderIndex(actionDto.getOrderIndex());
+            action.setDelayHours(actionDto.getDelayHours());
+            action.setActionParams(actionDto.getActionParams());
+            actionRepository.save(action);
+        }
+        
+        return workflowRepository.save(workflow);
     }
 
     public Workflow getWorkflow(Long id) {

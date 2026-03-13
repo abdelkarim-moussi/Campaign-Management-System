@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface WorkflowActionRepository extends JpaRepository<WorkflowAction, Long> {
     List<WorkflowAction> findByWorkflowIdOrderByOrderIndexAsc(Long workflowId);
+    void deleteByWorkflowId(Long workflowId);
 }
