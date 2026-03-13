@@ -1,6 +1,6 @@
 @ApplicationModule(
         displayName = "Marketing Automation",
-        allowedDependencies = {"contact", "template", "channel", "campaign", "common :: security"}
+        allowedDependencies = {"contact", "template", "channel", "campaign", "common :: security", "contact :: contact-events"}
 )
 package com.app.cms.automation;
 

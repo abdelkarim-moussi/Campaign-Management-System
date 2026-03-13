@@ -9,10 +9,13 @@ import com.app.cms.automation.repository.WorkflowExecutionRepository;
 import com.app.cms.automation.repository.WorkflowLogRepository;
 import com.app.cms.automation.repository.WorkflowRepository;
 import com.app.cms.common.security.OrganizationContext;
+import com.app.cms.contact.Contact;
 import com.app.cms.contact.ContactService;
+import com.app.cms.contact.event.ContactCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,6 +146,31 @@ public class WorkflowServiceImpl {
                 workflow.getCreatedAt()
         );
     }
+
+    @ApplicationModuleListener
+    public void onContactCreated(ContactCreatedEvent event) {
+        log.debug("Checking workflows for CONTACT_CREATED trigger");
+
+        Contact contact = contactService.getContact(event.contactId());
+        Long organizationId = contact.getOrganizationId();
+
+        List<Workflow> workflows = workflowRepository
+                .findActiveTriggers(organizationId, WorkflowTriggerType.CONTACT_CREATED);
+
+        if (workflows.isEmpty()) {
+            log.debug("No active CONTACT_CREATED workflows for organization {}", organizationId);
+            return;
+        }
+
+        for (Workflow workflow : workflows) {
+            log.info("Triggering workflow '{}' for new contact {} in organization {}",
+                    workflow.getName(), contact.getId(), organizationId);
+            executionService.startExecution(workflow, contact);
+        }
+
+    }
+
+
 
 
 }
