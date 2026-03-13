@@ -7,8 +7,12 @@ import com.app.cms.automation.entity.WorkflowExecution;
 import com.app.cms.automation.repository.WorkflowExecutionRepository;
 import com.app.cms.automation.repository.WorkflowLogRepository;
 import com.app.cms.channel.ChannelService;
+import com.app.cms.channel.EmailDto;
+import com.app.cms.channel.SmsDto;
 import com.app.cms.contact.Contact;
 import com.app.cms.contact.ContactService;
+import com.app.cms.contact.ContactStatus;
+import com.app.cms.template.TemplatePreviewResult;
 import com.app.cms.template.TemplateService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -98,4 +104,101 @@ public class WorkflowExecutionService {
         }
     }
 
+    @Transactional
+    protected void handleWaitAction(WorkflowExecution execution, WorkflowAction action) {
+        log.info("⏰ Waiting {} hours before next action", action.getDelayHours());
+
+        execution.setStatus(ExecutionStatus.WAITING);
+        execution.setResumeAt(LocalDateTime.now().plusHours(action.getDelayHours()));
+        executionRepository.save(execution);
+
+        logAction(execution, action, true, "Waiting " + action.getDelayHours() + " hours");
+
+        execution.setCurrentActionIndex(execution.getCurrentActionIndex() + 1);
+        executionRepository.save(execution);
+    }
+
+    private boolean performAction(WorkflowExecution execution, WorkflowAction action) {
+        Contact contact = execution.getContact();
+
+        try {
+            Map<String, Object> params = parseActionParams(action.getActionParams());
+
+            switch (action.getType()) {
+                case SEND_EMAIL:
+                    return sendEmail(contact, params);
+
+                case SEND_SMS:
+                    return sendSms(contact, params);
+
+                case CHANGE_STATUS:
+                    return changeStatus(contact, params);
+
+                default:
+                    log.warn("Unknown action type: {}", action.getType());
+                    return false;
+            }
+
+        } catch (Exception e) {
+            log.error("Error performing action {}: {}", action.getType(), e.getMessage());
+            logAction(execution, action, false, e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean sendEmail(Contact contact, Map<String, Object> params) {
+        Long templateId = Long.valueOf(params.get("templateId").toString());
+
+        Map<String, String> variables = new HashMap<>();
+        variables.put("firstName", contact.getFirstName());
+        variables.put("lastName", contact.getLastName());
+        variables.put("email", contact.getEmail());
+        variables.put("company", contact.getCompany() != null ? contact.getCompany() : "");
+
+        TemplatePreviewResult processed =
+                templateService.processTemplateForCampaign(templateId, variables);
+
+        EmailDto emailDto = new EmailDto(
+                null,
+                contact.getId(),
+                contact.getEmail(),
+                processed.getSubject(),
+                processed.getContent(),
+                null,
+                null
+        );
+
+        var result = channelService.sendEmail(emailDto);
+        return result.isSuccess();
+    }
+
+    private boolean sendSms(Contact contact, Map<String, Object> params) {
+        Long templateId = Long.valueOf(params.get("templateId").toString());
+
+        Map<String, String> variables = new HashMap<>();
+        variables.put("firstName", contact.getFirstName());
+        variables.put("lastName", contact.getLastName());
+
+        TemplatePreviewResult processed =
+                templateService.processTemplateForCampaign(templateId, variables);
+
+        SmsDto smsDto = new SmsDto(
+                null,
+                contact.getId(),
+                contact.getPhone(),
+                processed.getContent(),
+                null
+        );
+
+        var result = channelService.sendSms(smsDto);
+        return result.isSuccess();
+    }
+
+    private boolean changeStatus(Contact contact, Map<String, Object> params) {
+        String newStatus = params.get("newStatus").toString();
+        contact.setStatus(ContactStatus.valueOf(newStatus));
+        contactService.updateContact(contact.getId(), null);  // Simplifier pour MVP
+        log.info("Changed status of contact {} to {}", contact.getId(), newStatus);
+        return true;
+    }
 }
