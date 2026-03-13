@@ -26,4 +26,6 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
 
     @Query("SELECT COUNT(w) FROM Workflow w WHERE w.organizationId = :organizationId")
     int countByOrganizationId(Long organizationId);
+
+    boolean existsByName(String name);
 }
