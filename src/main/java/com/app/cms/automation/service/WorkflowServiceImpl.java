@@ -9,12 +9,15 @@ import com.app.cms.automation.repository.WorkflowActionRepository;
 import com.app.cms.automation.repository.WorkflowExecutionRepository;
 import com.app.cms.automation.repository.WorkflowLogRepository;
 import com.app.cms.automation.repository.WorkflowRepository;
+import com.app.cms.common.security.OrganizationContext;
 import com.app.cms.contact.ContactService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +62,23 @@ public class WorkflowServiceImpl {
 
         log.info("Workflow created with {} actions", dto.getActions().size());
         return saved;
+    }
+
+    public Workflow getWorkflow(Long id) {
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return workflowRepository.findByIdAndOrganizationId(id,organizationId)
+                .orElseThrow(() -> new RuntimeException("Workflow not found: " + id));
+    }
+
+    public List<Workflow> getAllWorkflows() {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return workflowRepository.findByOrganizationId(organizationId);
+    }
+
+    public List<Workflow> getActiveWorkflows() {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return workflowRepository.findByOrganizationIdAndStatus(organizationId,WorkflowStatus.ACTIVE);
     }
 }
