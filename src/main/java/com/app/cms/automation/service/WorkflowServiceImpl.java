@@ -8,6 +8,7 @@ import com.app.cms.automation.repository.WorkflowActionRepository;
 import com.app.cms.automation.repository.WorkflowExecutionRepository;
 import com.app.cms.automation.repository.WorkflowLogRepository;
 import com.app.cms.automation.repository.WorkflowRepository;
+import com.app.cms.campaign.events.CampaignSentEvent;
 import com.app.cms.common.security.OrganizationContext;
 import com.app.cms.contact.Contact;
 import com.app.cms.contact.ContactService;
@@ -24,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WorkflowServiceImpl {
+public class WorkflowServiceImpl implements WorkflowService {
 
     private final WorkflowRepository workflowRepository;
     private final WorkflowActionRepository actionRepository;
@@ -170,7 +171,12 @@ public class WorkflowServiceImpl {
 
     }
 
+    @ApplicationModuleListener
+    public void onCampaignSent(CampaignSentEvent event) {
+        log.debug("Checking workflows for CAMPAIGN_SENT trigger");
 
+
+    }
 
 
 }
