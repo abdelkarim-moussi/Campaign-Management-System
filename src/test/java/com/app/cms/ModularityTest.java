@@ -9,7 +9,6 @@ public class ModularityTest {
 
     @Test
     void shouldBeCompliant() {
-        // Vérifie que tous les modules respectent les règles
         modules.verify();
     }
 

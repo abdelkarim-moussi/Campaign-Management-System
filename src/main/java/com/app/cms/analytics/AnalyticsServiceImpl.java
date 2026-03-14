@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,23 +25,41 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         log.info("Analytics: Campaign sent event received for campaign {}", event.campaignId());
 
         Long organizationId = event.organizationId();
+        int maxRetries = 3;
+        int retryCount = 0;
 
-        CampaignStats stats = campaignStatsRepository
-                .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
-                .orElse(new CampaignStats());
+        while (retryCount < maxRetries) {
+            try {
+                CampaignStats stats = campaignStatsRepository
+                        .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
+                        .orElseGet(() -> {
+                            CampaignStats newStats = new CampaignStats();
+                            newStats.setCampaignId(event.campaignId());
+                            newStats.setOrganizationId(organizationId);
+                            return newStats;
+                        });
 
-        stats.setCampaignId(event.campaignId());
-        stats.setCampaignName(event.campaignName());
-        stats.setTotalRecipients(event.totalRecipients());
-        stats.setOrganizationId(organizationId);
+                stats.setCampaignName(event.campaignName());
+                stats.setTotalRecipients(event.totalRecipients());
 
-        if (stats.getFirstSentAt() == null) {
-            stats.setFirstSentAt(event.sentAt());
+                if (stats.getFirstSentAt() == null) {
+                    stats.setFirstSentAt(event.sentAt());
+                }
+
+                campaignStatsRepository.save(stats);
+                log.info("Campaign stats initialized for campaign {}", event.campaignId());
+                return;
+
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                log.warn("Race condition in onCampaignSent for campaign {}. Retrying... (Attempt {})",
+                        event.campaignId(), retryCount + 1);
+                retryCount++;
+                try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); return; }
+            } catch (Exception e) {
+                log.error("Failed to initialize stats for campaign {}: {}", event.campaignId(), e.getMessage(), e);
+                return;
+            }
         }
-
-        campaignStatsRepository.save(stats);
-
-        log.info("Campaign stats initialized for campaign {}", event.campaignId());
     }
 
     @ApplicationModuleListener
@@ -48,7 +67,63 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         log.debug("Analytics: Message sent event received for message {}", event.messageId());
 
         Long organizationId = event.organizationId();
+        int maxRetries = 3;
+        int retryCount = 0;
 
+        while (retryCount < maxRetries) {
+            try {
+                CampaignStats stats = campaignStatsRepository
+                        .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
+                        .orElseGet(() -> {
+                            CampaignStats newStats = new CampaignStats();
+                            newStats.setCampaignId(event.campaignId());
+                            newStats.setOrganizationId(organizationId);
+                            return newStats;
+                        });
+
+                if (event.success()) {
+                    stats.setTotalSent(stats.getTotalSent() + 1);
+                    stats.setTotalDelivered(stats.getTotalDelivered() + 1);
+
+                    MessageTracking tracking = new MessageTracking();
+                    tracking.setOrganizationId(organizationId);
+                    tracking.setMessageId(event.messageId());
+                    tracking.setCampaignId(event.campaignId());
+                    tracking.setContactId(event.contactId());
+                    tracking.setEventType(TrackingEventType.SENT);
+                    tracking.setEventAt(event.sentAt());
+                    messageTrackingRepository.save(tracking);
+
+                    MessageTracking deliveryTracking = new MessageTracking();
+                    deliveryTracking.setOrganizationId(organizationId);
+                    deliveryTracking.setMessageId(event.messageId());
+                    deliveryTracking.setCampaignId(event.campaignId());
+                    deliveryTracking.setContactId(event.contactId());
+                    deliveryTracking.setEventType(TrackingEventType.DELIVERED);
+                    deliveryTracking.setEventAt(event.sentAt());
+                    messageTrackingRepository.save(deliveryTracking);
+
+                } else {
+                    stats.setTotalFailed(stats.getTotalFailed() + 1);
+                }
+
+                stats.calculateRates();
+                campaignStatsRepository.save(stats);
+                return; // Success
+
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                log.warn("Race condition in onMessageSent for campaign {}. Retrying... (Attempt {})",
+                        event.campaignId(), retryCount + 1);
+                retryCount++;
+                try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); return; }
+            } catch (Exception e) {
+                log.error("Failed to process analytics for campaign {}: {}", event.campaignId(), e.getMessage(), e);
+                return;
+            }
+        }
+    }
+
+    private void updateStats(MessageSentEvent event, Long organizationId) {
         CampaignStats stats = campaignStatsRepository
                 .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
                 .orElseGet(() -> {
@@ -85,7 +160,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         }
 
         stats.calculateRates();
-
         campaignStatsRepository.save(stats);
     }
 

@@ -255,6 +255,8 @@ public class CampaignServiceImpl implements CampaignService {
             try {
 
                 Contact contact = cc.getContact();
+                cc.setOrganizationId(organizationId);
+
                 Map<String, String> variables = new HashMap<>();
                 variables.put("firstName", contact.getFirstName());
                 variables.put("lastName", contact.getLastName());

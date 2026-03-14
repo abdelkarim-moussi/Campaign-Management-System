@@ -7,11 +7,9 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
-import java.util.Properties;
 import java.util.UUID;
 
 @Component
@@ -22,31 +20,51 @@ public class SmtpAdapter {
     private final JavaMailSender mailSender;
 
     public SendResult send(EmailDto emailDto) {
-        log.info("Sending email via SMTP to: {}", emailDto.getTo());
+        int maxRetries = 3;
+        int retryCount = 0;
+        int delayMs = 2000;
 
-        try {
+        while (retryCount < maxRetries) {
+            try {
+                log.info("Sending email via SMTP to: {} (Attempt {})", emailDto.getTo(), retryCount + 1);
 
-            // Create message
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(emailConfig.getFromEmail(), emailConfig.getFromName());
-            helper.setTo(emailDto.getTo());
-            helper.setSubject(emailDto.getSubject());
-            helper.setText(emailDto.getContent(), true);  // true = HTML
+                helper.setFrom(emailConfig.getFromEmail(), emailConfig.getFromName());
+                helper.setTo(emailDto.getTo());
+                helper.setSubject(emailDto.getSubject());
+                helper.setText(emailDto.getContent(), true);
 
-            // Send
-            mailSender.send(message);
+                mailSender.send(message);
 
-            // Generate Local ID
-            String messageId = "mailtrap-" + UUID.randomUUID().toString();
+                String messageId = "mailtrap-" + UUID.randomUUID().toString();
+                log.info("Email sent successfully via SMTP. MessageID: {}", messageId);
+                return new SendResult(true, null, messageId, null);
 
-            log.info("Email sent successfully via SMTP. MessageID: {}", messageId);
-            return new SendResult(true, null, messageId, null);
+            } catch (Exception e) {
+                String errorMsg = e.getMessage();
+                log.warn("Attempt {} failed to send email to {}: {}", retryCount + 1, emailDto.getTo(), errorMsg);
 
-        } catch (Exception e) {
-            log.error("Failed to send email via SMTP: {}", e.getMessage(), e);
-            return new SendResult(false, null, null, e.getMessage());
+                if (errorMsg != null && errorMsg.contains("Too many emails per second")) {
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        log.info("Rate limit hit. Retrying in {}ms...", delayMs);
+                        try {
+                            Thread.sleep(delayMs);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            return new SendResult(false, null, null, "Interrupted during retry delay");
+                        }
+                        delayMs *= 2; // Exponential backoff
+                        continue;
+                    }
+                }
+                
+                log.error("Failed to send email via SMTP after {} attempts: {}", retryCount + 1, errorMsg, e);
+                return new SendResult(false, null, null, errorMsg);
+            }
         }
+        return new SendResult(false, null, null, "Max retries exceeded for email delivery");
     }
 }
