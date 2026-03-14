@@ -1,6 +1,6 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.entity;
 
-import com.app.cms.contact.Contact;
+import com.app.cms.contact.entity.Contact;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

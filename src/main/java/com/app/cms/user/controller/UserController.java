@@ -1,4 +1,4 @@
-package com.app.cms.user.web;
+package com.app.cms.user.controller;
 
 import com.app.cms.user.dto.InviteUserRequest;
 import com.app.cms.user.dto.UpdateProfileRequest;

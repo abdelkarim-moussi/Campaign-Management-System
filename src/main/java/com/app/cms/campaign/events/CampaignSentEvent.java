@@ -1,6 +1,6 @@
 package com.app.cms.campaign.events;
 
-import com.app.cms.campaign.CampaignChannel;
+import com.app.cms.campaign.entity.CampaignChannel;
 
 import java.time.LocalDateTime;
 

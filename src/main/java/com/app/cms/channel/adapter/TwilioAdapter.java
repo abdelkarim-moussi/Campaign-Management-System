@@ -1,7 +1,7 @@
-package com.app.cms.channel.internal;
+package com.app.cms.channel.adapter;
 
-import com.app.cms.channel.SendResult;
-import com.app.cms.channel.SmsDto;
+import com.app.cms.channel.dto.SendResult;
+import com.app.cms.channel.dto.SmsDto;
 import com.app.cms.channel.config.SmsConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

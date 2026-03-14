@@ -1,5 +1,8 @@
-package com.app.cms.template;
+package com.app.cms.template.repository;
 
+import com.app.cms.template.entity.TemplateStatus;
+import com.app.cms.template.entity.TemplateType;
+import com.app.cms.template.entity.Template;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

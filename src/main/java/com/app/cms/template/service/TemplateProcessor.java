@@ -1,4 +1,4 @@
-package com.app.cms.template;
+package com.app.cms.template.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

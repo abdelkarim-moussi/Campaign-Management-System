@@ -1,5 +1,9 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.service;
 
+import com.app.cms.analytics.entity.CampaignStats;
+import com.app.cms.analytics.dto.CampaignStatsDto;
+import com.app.cms.analytics.entity.MessageTracking;
+import com.app.cms.analytics.entity.TrackingEventType;
 import com.app.cms.campaign.events.CampaignSentEvent;
 import com.app.cms.channel.events.MessageSentEvent;
 

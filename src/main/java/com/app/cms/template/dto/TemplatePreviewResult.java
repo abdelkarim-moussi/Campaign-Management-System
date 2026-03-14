@@ -1,4 +1,4 @@
-package com.app.cms.template;
+package com.app.cms.template.dto;
 
 import lombok.Builder;
 import lombok.Data;

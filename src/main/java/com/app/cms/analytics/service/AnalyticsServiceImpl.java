@@ -1,5 +1,11 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.service;
 
+import com.app.cms.analytics.dto.CampaignStatsDto;
+import com.app.cms.analytics.entity.CampaignStats;
+import com.app.cms.analytics.entity.MessageTracking;
+import com.app.cms.analytics.entity.TrackingEventType;
+import com.app.cms.analytics.repository.CampaignStatsRepository;
+import com.app.cms.analytics.repository.MessageTrackingRepository;
 import com.app.cms.campaign.events.CampaignSentEvent;
 import com.app.cms.channel.events.MessageSentEvent;
 import com.app.cms.common.security.OrganizationContext;
@@ -11,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.dao.DataIntegrityViolationException;
 
 @Service
 @RequiredArgsConstructor

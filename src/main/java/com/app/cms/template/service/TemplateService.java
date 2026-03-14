@@ -1,4 +1,10 @@
-package com.app.cms.template;
+package com.app.cms.template.service;
+
+import com.app.cms.template.dto.TemplateDTO;
+import com.app.cms.template.dto.TemplatePreviewResult;
+import com.app.cms.template.entity.Template;
+import com.app.cms.template.entity.TemplateStatus;
+import com.app.cms.template.entity.TemplateType;
 
 import java.util.List;
 import java.util.Map;

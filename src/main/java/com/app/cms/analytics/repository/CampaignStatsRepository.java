@@ -1,5 +1,6 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.repository;
 
+import com.app.cms.analytics.entity.CampaignStats;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

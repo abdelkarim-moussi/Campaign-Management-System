@@ -1,6 +1,14 @@
-package com.app.cms.template;
+package com.app.cms.template.service;
 
 import com.app.cms.common.security.OrganizationContext;
+import com.app.cms.template.mapper.TemplateMapper;
+import com.app.cms.template.TemplateNotFoundException;
+import com.app.cms.template.dto.TemplateDTO;
+import com.app.cms.template.dto.TemplatePreviewResult;
+import com.app.cms.template.entity.Template;
+import com.app.cms.template.entity.TemplateStatus;
+import com.app.cms.template.entity.TemplateType;
+import com.app.cms.template.repository.TemplateRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,5 +1,7 @@
-package com.app.cms.contact;
+package com.app.cms.contact.repository;
 
+import com.app.cms.contact.entity.ContactStatus;
+import com.app.cms.contact.entity.Contact;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

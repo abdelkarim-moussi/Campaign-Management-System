@@ -1,9 +1,15 @@
-package com.app.cms.contact;
+package com.app.cms.contact.service;
 
 import com.app.cms.common.NotFoundException;
 import com.app.cms.common.security.OrganizationContext;
+import com.app.cms.contact.ContactDto;
+import com.app.cms.contact.entity.ContactStatus;
+import com.app.cms.contact.entity.Tag;
+import com.app.cms.contact.repository.TagRepository;
+import com.app.cms.contact.entity.Contact;
 import com.app.cms.contact.event.ContactCreatedEvent;
 import com.app.cms.contact.exception.EmailAlreadyExistException;
+import com.app.cms.contact.repository.ContactRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;

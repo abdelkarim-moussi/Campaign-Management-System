@@ -1,4 +1,4 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.entity;
 
 public enum TrackingEventType {
     SENT,

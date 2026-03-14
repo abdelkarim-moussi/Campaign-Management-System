@@ -1,5 +1,8 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.sheduler;
 
+import com.app.cms.campaign.entity.Campaign;
+import com.app.cms.campaign.repository.CampaignRepository;
+import com.app.cms.campaign.service.CampaignService;
 import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

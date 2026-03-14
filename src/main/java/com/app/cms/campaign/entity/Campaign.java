@@ -1,6 +1,6 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.entity;
 
-import com.app.cms.template.Template;
+import com.app.cms.template.entity.Template;
 import jakarta.persistence.*;
 import lombok.*;
 

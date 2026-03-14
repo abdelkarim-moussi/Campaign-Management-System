@@ -1,5 +1,7 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.repository;
 
+import com.app.cms.campaign.entity.MessageStatus;
+import com.app.cms.campaign.entity.CampaignContact;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

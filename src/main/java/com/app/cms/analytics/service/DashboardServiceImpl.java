@@ -1,5 +1,12 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.service;
 
+import com.app.cms.analytics.dto.DashboardDto;
+import com.app.cms.analytics.entity.CampaignStats;
+import com.app.cms.analytics.entity.MessageTracking;
+import com.app.cms.analytics.entity.PerformanceMetrics;
+import com.app.cms.analytics.entity.TrackingEventType;
+import com.app.cms.analytics.repository.CampaignStatsRepository;
+import com.app.cms.analytics.repository.MessageTrackingRepository;
 import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

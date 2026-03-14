@@ -1,5 +1,13 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.controller;
 
+import com.app.cms.analytics.dto.CampaignStatsDto;
+import com.app.cms.analytics.dto.DashboardDto;
+import com.app.cms.analytics.entity.CampaignStats;
+import com.app.cms.analytics.entity.MessageTracking;
+import com.app.cms.analytics.entity.PerformanceMetrics;
+import com.app.cms.analytics.entity.TrackingEventType;
+import com.app.cms.analytics.service.AnalyticsService;
+import com.app.cms.analytics.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

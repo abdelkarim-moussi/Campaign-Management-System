@@ -1,6 +1,11 @@
-package com.app.cms.campaign.web;
+package com.app.cms.campaign.controller;
 
-import com.app.cms.campaign.*;
+import com.app.cms.campaign.dto.CampaignDto;
+import com.app.cms.campaign.dto.CampaignSummaryDto;
+import com.app.cms.campaign.entity.Campaign;
+import com.app.cms.campaign.entity.CampaignContact;
+import com.app.cms.campaign.entity.CampaignStatus;
+import com.app.cms.campaign.service.CampaignService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

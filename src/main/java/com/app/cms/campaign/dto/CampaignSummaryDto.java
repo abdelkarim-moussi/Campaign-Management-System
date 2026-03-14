@@ -1,5 +1,7 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.dto;
 
+import com.app.cms.campaign.entity.CampaignChannel;
+import com.app.cms.campaign.entity.CampaignStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

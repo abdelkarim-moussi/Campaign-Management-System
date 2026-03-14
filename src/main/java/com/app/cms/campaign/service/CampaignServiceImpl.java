@@ -1,17 +1,26 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.service;
 
+import com.app.cms.campaign.entity.CampaignStatus;
+import com.app.cms.campaign.dto.CampaignSummaryDto;
+import com.app.cms.campaign.entity.MessageStatus;
+import com.app.cms.campaign.dto.CampaignDto;
+import com.app.cms.campaign.entity.Campaign;
+import com.app.cms.campaign.entity.CampaignChannel;
+import com.app.cms.campaign.entity.CampaignContact;
 import com.app.cms.campaign.events.CampaignCreatedEvent;
 import com.app.cms.campaign.events.CampaignSentEvent;
-import com.app.cms.channel.ChannelService;
-import com.app.cms.channel.EmailDto;
-import com.app.cms.channel.SendResult;
-import com.app.cms.channel.SmsDto;
+import com.app.cms.campaign.repository.CampaignContactRepository;
+import com.app.cms.campaign.repository.CampaignRepository;
+import com.app.cms.channel.service.ChannelService;
+import com.app.cms.channel.dto.EmailDto;
+import com.app.cms.channel.dto.SendResult;
+import com.app.cms.channel.dto.SmsDto;
 import com.app.cms.common.security.OrganizationContext;
-import com.app.cms.contact.Contact;
-import com.app.cms.contact.ContactService;
-import com.app.cms.template.Template;
-import com.app.cms.template.TemplatePreviewResult;
-import com.app.cms.template.TemplateService;
+import com.app.cms.contact.entity.Contact;
+import com.app.cms.contact.service.ContactService;
+import com.app.cms.template.entity.Template;
+import com.app.cms.template.dto.TemplatePreviewResult;
+import com.app.cms.template.service.TemplateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -298,12 +307,12 @@ public class CampaignServiceImpl implements CampaignService {
                 }
 
                 if (result.isSuccess()) {
-                    cc.setStatus(com.app.cms.campaign.MessageStatus.SENT);
+                    cc.setStatus(MessageStatus.SENT);
                     cc.setMessageSentId(result.getMessageId());
                     cc.setSentAt(LocalDateTime.now());
                     successCount++;
                 } else {
-                    cc.setStatus(com.app.cms.campaign.MessageStatus.FAILED);
+                    cc.setStatus(MessageStatus.FAILED);
                     failureCount++;
                 }
 

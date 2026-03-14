@@ -1,5 +1,7 @@
-package com.app.cms.template;
+package com.app.cms.template.mapper;
 
+import com.app.cms.template.dto.TemplateDTO;
+import com.app.cms.template.entity.Template;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Builder;

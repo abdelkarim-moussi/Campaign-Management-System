@@ -1,7 +1,7 @@
-package com.app.cms.channel.web;
+package com.app.cms.channel.controller;
 
-import com.app.cms.channel.ChannelService;
-import com.app.cms.channel.MessageSent;
+import com.app.cms.channel.service.ChannelService;
+import com.app.cms.channel.entity.MessageSent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

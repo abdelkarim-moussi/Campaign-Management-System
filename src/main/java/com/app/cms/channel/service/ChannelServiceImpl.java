@@ -1,11 +1,18 @@
-package com.app.cms.channel;
+package com.app.cms.channel.service;
 
 import com.app.cms.channel.config.EmailConfig;
 import com.app.cms.channel.config.SmsConfig;
+import com.app.cms.channel.dto.EmailDto;
+import com.app.cms.channel.dto.SendResult;
+import com.app.cms.channel.dto.SmsDto;
+import com.app.cms.channel.entity.MessageSent;
+import com.app.cms.channel.entity.MessageStatus;
+import com.app.cms.channel.entity.MessageType;
 import com.app.cms.channel.events.MessageSentEvent;
-import com.app.cms.channel.internal.PostmarkAdapter;
-import com.app.cms.channel.internal.SmtpAdapter;
-import com.app.cms.channel.internal.TwilioAdapter;
+import com.app.cms.channel.adapter.PostmarkAdapter;
+import com.app.cms.channel.adapter.SmtpAdapter;
+import com.app.cms.channel.adapter.TwilioAdapter;
+import com.app.cms.channel.repository.MessageSentRepository;
 import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

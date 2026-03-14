@@ -1,5 +1,11 @@
-package com.app.cms.template;
+package com.app.cms.template.controller;
 
+import com.app.cms.template.dto.TemplateDTO;
+import com.app.cms.template.dto.TemplatePreviewResult;
+import com.app.cms.template.entity.Template;
+import com.app.cms.template.entity.TemplateStatus;
+import com.app.cms.template.entity.TemplateType;
+import com.app.cms.template.service.TemplateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

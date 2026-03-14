@@ -1,5 +1,7 @@
-package com.app.cms.channel;
+package com.app.cms.channel.repository;
 
+import com.app.cms.channel.entity.MessageSent;
+import com.app.cms.channel.entity.MessageStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

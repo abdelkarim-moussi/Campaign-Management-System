@@ -1,4 +1,4 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

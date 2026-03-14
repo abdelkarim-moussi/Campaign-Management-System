@@ -1,4 +1,8 @@
-package com.app.cms.contact;
+package com.app.cms.contact.service;
+
+import com.app.cms.contact.ContactDto;
+import com.app.cms.contact.entity.ContactStatus;
+import com.app.cms.contact.entity.Contact;
 
 import java.util.List;
 

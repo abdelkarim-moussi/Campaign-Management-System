@@ -1,5 +1,6 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.dto;
 
+import com.app.cms.campaign.entity.CampaignChannel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

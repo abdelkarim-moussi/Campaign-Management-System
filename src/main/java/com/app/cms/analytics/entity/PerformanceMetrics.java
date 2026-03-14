@@ -1,4 +1,4 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

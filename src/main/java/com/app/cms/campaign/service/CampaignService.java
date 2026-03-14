@@ -1,4 +1,10 @@
-package com.app.cms.campaign;
+package com.app.cms.campaign.service;
+
+import com.app.cms.campaign.entity.CampaignStatus;
+import com.app.cms.campaign.dto.CampaignSummaryDto;
+import com.app.cms.campaign.dto.CampaignDto;
+import com.app.cms.campaign.entity.Campaign;
+import com.app.cms.campaign.entity.CampaignContact;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.app.cms.channel;
+package com.app.cms.channel.entity;
 
 public enum MessageType {
     EMAIL,

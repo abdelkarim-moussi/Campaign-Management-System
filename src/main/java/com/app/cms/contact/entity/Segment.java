@@ -1,4 +1,4 @@
-package com.app.cms.contact;
+package com.app.cms.contact.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;

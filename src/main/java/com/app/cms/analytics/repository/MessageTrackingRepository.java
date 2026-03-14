@@ -1,5 +1,7 @@
-package com.app.cms.analytics;
+package com.app.cms.analytics.repository;
 
+import com.app.cms.analytics.entity.MessageTracking;
+import com.app.cms.analytics.entity.TrackingEventType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

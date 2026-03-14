@@ -1,4 +1,4 @@
-package com.app.cms.template;
+package com.app.cms.template.entity;
 
 public enum TemplateType {
     EMAIL,

@@ -1,9 +1,9 @@
-package com.app.cms.contact.web;
+package com.app.cms.contact.controller;
 
 import com.app.cms.contact.ContactDto;
-import com.app.cms.contact.ContactService;
-import com.app.cms.contact.Contact;
-import com.app.cms.contact.ContactStatus;
+import com.app.cms.contact.service.ContactService;
+import com.app.cms.contact.entity.Contact;
+import com.app.cms.contact.entity.ContactStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
