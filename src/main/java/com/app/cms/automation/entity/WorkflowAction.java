@@ -1,5 +1,6 @@
 package com.app.cms.automation.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,7 @@ public class WorkflowAction {
 
     @ManyToOne
     @JoinColumn(name = "workflow_id", nullable = false)
+    @JsonIgnore
     private Workflow workflow;
 
     @Enumerated(EnumType.STRING)
