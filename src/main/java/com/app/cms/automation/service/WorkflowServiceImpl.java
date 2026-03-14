@@ -8,10 +8,13 @@ import com.app.cms.automation.repository.WorkflowActionRepository;
 import com.app.cms.automation.repository.WorkflowExecutionRepository;
 import com.app.cms.automation.repository.WorkflowLogRepository;
 import com.app.cms.automation.repository.WorkflowRepository;
+import com.app.cms.campaign.entity.CampaignContact;
+import com.app.cms.campaign.entity.MessageStatus;
 import com.app.cms.campaign.events.CampaignSentEvent;
+import com.app.cms.campaign.service.CampaignService;
 import com.app.cms.common.security.OrganizationContext;
-import com.app.cms.contact.Contact;
-import com.app.cms.contact.ContactService;
+import com.app.cms.contact.entity.Contact;
+import com.app.cms.contact.service.ContactService;
 import com.app.cms.contact.event.ContactCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final WorkflowExecutionService executionService;
     private final ContactService contactService;
     private final ObjectMapper objectMapper;
+    private final CampaignService campaignService;
 
     @Transactional
     public Workflow createWorkflow(WorkflowDto dto) {
@@ -201,9 +206,82 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @ApplicationModuleListener
     public void onCampaignSent(CampaignSentEvent event) {
-        log.debug("Checking workflows for CAMPAIGN_SENT trigger");
+        log.info("Checking workflows for CAMPAIGN_SENT trigger in organization {}",
+                event.organizationId());
 
+        List<Workflow> workflows = workflowRepository
+                .findActiveTriggers(event.organizationId(), WorkflowTriggerType.CAMPAIGN_SENT);
 
+        if (workflows.isEmpty()) {
+            log.debug("No active CAMPAIGN_SENT workflows for organization {}", event.organizationId());
+            return;
+        }
+
+        log.info("Found {} active workflows for CAMPAIGN_SENT", workflows.size());
+
+        List<CampaignContact> campaignContacts = campaignService.getCampaignContacts(event.campaignId());
+
+        log.info("Campaign {} has {} contacts", event.campaignId(), campaignContacts.size());
+
+        for (Workflow workflow : workflows) {
+
+            if (shouldTriggerWorkflowForCampaign(workflow, event)) {
+
+                for (CampaignContact cc : campaignContacts) {
+                    Contact contact = cc.getContact();
+
+                    if (cc.getStatus() == MessageStatus.SENT ||
+                            cc.getStatus() == MessageStatus.DELIVERED) {
+
+                        log.info("Triggering workflow '{}' for contact {} (campaign: {})",
+                                workflow.getName(), contact.getId(), event.campaignId());
+
+                        executionService.startExecution(workflow, contact);
+                    } else {
+                        log.debug("Skipping contact {} - message not sent (status: {})",
+                                contact.getId(), cc.getStatus());
+                    }
+                }
+            }
+        }
+
+    }
+
+    private boolean shouldTriggerWorkflowForCampaign(Workflow workflow, CampaignSentEvent event) {
+
+        if (workflow.getTriggerParams() == null || workflow.getTriggerParams().isEmpty() ||
+                workflow.getTriggerParams().equals("{}")) {
+            return true;
+        }
+
+        try {
+
+            Map<String, Object> params = objectMapper.readValue(workflow.getTriggerParams(), Map.class);
+
+            if (params.containsKey("campaignId")) {
+                Long specificCampaignId = Long.valueOf(params.get("campaignId").toString());
+                if (!event.campaignId().equals(specificCampaignId)) {
+                    log.debug("Workflow '{}' is configured for campaign {} only, skipping campaign {}",
+                            workflow.getName(), specificCampaignId, event.campaignId());
+                    return false;
+                }
+            }
+
+            if (params.containsKey("channel")) {
+                String specificChannel = params.get("channel").toString();
+                if (!event.channel().toString().equals(specificChannel)) {
+                    log.debug("Workflow '{}' is configured for channel {} only, skipping channel {}",
+                            workflow.getName(), specificChannel, event.channel());
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            log.error("Error parsing workflow trigger params: {}", e.getMessage());
+            return true;
+        }
     }
 
 

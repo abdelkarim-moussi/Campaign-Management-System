@@ -2,7 +2,7 @@ package com.app.cms.automation.service;
 
 import com.app.cms.automation.entity.Workflow;
 import com.app.cms.automation.entity.WorkflowExecution;
-import com.app.cms.contact.Contact;
+import com.app.cms.contact.entity.Contact;
 
 
 public interface WorkflowExecutionService {
