@@ -3,6 +3,7 @@ package com.app.cms.common.security;
 import com.app.cms.user.entity.User;
 import com.app.cms.user.entity.UserStatus;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,11 +12,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+@RequiredArgsConstructor
 @Getter
 public class UserDetailsImpl implements UserDetails {
-    private final Long userId;
-    private final Long organizationId;
-    private final String userEmail;
+    private final User user;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -25,9 +25,7 @@ public class UserDetailsImpl implements UserDetails {
     private final boolean enabled;
 
     public UserDetailsImpl(User user) {
-        this.userId = user.getId();
-        this.organizationId = user.getOrganization().getId();
-        this.userEmail = user.getEmail();
+        this.user = user;
         this.password = user.getPassword();
 
         Set<GrantedAuthority> auths = new HashSet<>();
@@ -52,7 +50,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.userEmail;
+        return this.user.getEmail();
     }
 
     @Override

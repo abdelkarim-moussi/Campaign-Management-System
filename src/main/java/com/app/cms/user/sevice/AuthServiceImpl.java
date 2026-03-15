@@ -10,9 +10,12 @@ import com.app.cms.user.mapper.UserMapper;
 import com.app.cms.user.repository.InvitationRepository;
 import com.app.cms.user.repository.OrganizationRepository;
 import com.app.cms.user.repository.UserRepository;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,12 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final UserMapper userMapper;
     private final OrganizationMapper organizationMapper;
+
+    @Value("${security.jwt.expiration-time}")
+    private long accessTokenExpirationTime;
+
+    @Value("${security.jwt.refresh-token.expiration-time}")
+    private long refreshTokenExpirationTime;
 
     @Transactional
     public LoginResponse register(RegisterRequest request) {
@@ -64,12 +73,7 @@ public class AuthServiceImpl implements AuthService {
         log.info("User created: {} with role OWNER", savedUser.getEmail());
 
 
-        Map<String,String> tokens = jwtService.generateTokenPair(new UserDetailsImpl(user));
-
-        UserDto userDto = userMapper.toDto(savedUser);
-        OrganizationDto orgDto = organizationMapper.toDto(savedOrg);
-
-        return new LoginResponse(tokens, userDto, orgDto);
+        return setResponse(user, organizationMapper.toDto(savedOrg), userMapper.toDto(savedUser));
     }
 
     @Transactional
@@ -104,7 +108,11 @@ public class AuthServiceImpl implements AuthService {
         UserDto userDto = userMapper.toDto(user);
         OrganizationDto orgDto = organizationMapper.toDto(user.getOrganization());
 
-        return new LoginResponse(tokens, userDto, orgDto);
+        LoginResponse response = new LoginResponse(tokens, userDto, orgDto);
+        response.setExpiresIn(accessTokenExpirationTime / 1000);
+        response.setSetRefreshExpiresIn(refreshTokenExpirationTime / 1000);
+
+        return response;
     }
 
     @Transactional
@@ -157,12 +165,63 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Invitation accepted. User created: {}", savedUser.getEmail());
 
+        return setResponse(savedUser, organizationMapper.toDto(org), userMapper.toDto(savedUser));
+    }
+
+    @NonNull
+    private LoginResponse setResponse(User savedUser, OrganizationDto orgDto, UserDto userDto) {
         Map<String,String> tokens = jwtService.generateTokenPair(new UserDetailsImpl(savedUser));
 
-        UserDto userDto = userMapper.toDto(savedUser);
-        OrganizationDto orgDto = organizationMapper.toDto(org);
+        LoginResponse response = new LoginResponse(tokens, userDto, orgDto);
+        response.setExpiresIn(accessTokenExpirationTime / 1000);
+        response.setSetRefreshExpiresIn(refreshTokenExpirationTime / 1000);
 
-        return new LoginResponse(tokens, userDto, orgDto);
+        return response;
+    }
+
+    @Transactional
+    public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
+        log.info("Refreshing tokens");
+
+        try {
+            String email = jwtService.extractUserName(request.getRefreshToken());
+
+            String tokenType = jwtService.extractTokenType(request.getRefreshToken());
+            if (!"REFRESH".equals(tokenType)) {
+                throw new IllegalArgumentException("Invalid token type, expected REFRESH token");
+            }
+
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+
+            if (user.getStatus() != UserStatus.ACTIVE) {
+                throw new IllegalArgumentException("User account is not active");
+            }
+
+            if (!user.getOrganization().isActive()) {
+                throw new IllegalArgumentException("Organization is not active");
+            }
+
+            UserDetailsImpl userDetails = new UserDetailsImpl(user);
+
+            Map<String, String> tokens = jwtService.refreshTokens(
+                    request.getRefreshToken(),
+                    userDetails
+            );
+
+            log.info("Tokens refreshed successfully for user: {}", email);
+
+            return new RefreshTokenResponse(
+                    tokens.get("accessToken"),
+                    tokens.get("refreshToken"),
+                    accessTokenExpirationTime / 1000,  // Access token expiration
+                    refreshTokenExpirationTime / 1000  // Refresh token expiration
+            );
+
+        } catch (Exception e) {
+            log.error("Failed to refresh tokens: {}", e.getMessage());
+            throw new IllegalArgumentException("Invalid or expired refresh token");
+        }
     }
 
     public UserDto getCurrentUser() {

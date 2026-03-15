@@ -27,6 +27,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<RefreshTokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        RefreshTokenResponse response = authService.refreshToken(request);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/accept-invitation")
     public ResponseEntity<LoginResponse> acceptInvitation(@Valid @RequestBody AcceptInvitationRequest request) {
         LoginResponse response = authService.acceptInvitation(request);
