@@ -23309,3 +23309,4 @@ org.springframework.transaction.UnexpectedRollbackException: Transaction silentl
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635) ~[na:na]
 	at java.base/java.lang.Thread.run(Thread.java:842) ~[na:na]
 
+2026-03-14T22:45:45.222Z  WARN 33224 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
