@@ -55,10 +55,10 @@ logging:
 security:
   jwt:
     secret-key: ${JWT_SECRET_KEY:custom_jwt_secret_key}
-    expiration-time: 3600000
+    expiration-time: 900000
 
     refresh-token:
-      expiration-time: 360000000
+      expiration-time: 604800000
 
 server:
   port: 9000
