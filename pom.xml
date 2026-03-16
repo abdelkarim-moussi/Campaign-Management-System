@@ -182,6 +182,9 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <finalName>campaign-cms</finalName>
     </build>
+
 
 </project>
