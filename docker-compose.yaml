@@ -1,39 +1,68 @@
 services:
-  db:
-    image: postgres
-    container_name: postgres_cms
-    restart: unless-stopped
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: cms-postgres
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
+      POSTGRES_DB: cms_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
-
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cms-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  backend:
-    image: campaign-cms-v1
+  # Spring Boot Application
+  app:
     build:
       context: .
-    container_name: backend-cms
-    restart: always
-
+      dockerfile: Dockerfile
+    container_name: cms-app
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
-      - POSTGRES-USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - SPRING_DATASOURCE_URL=${POSTGRES_DATASOURCE_URL}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      # Database
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cms_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+      # JWT
+      SECURITY_JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
+      SECURITY_JWT_EXPIRATION_TIME: 86400000
+      SECURITY_JWT_REFRESH_TOKEN_EXPIRATION_TIME: 604800000
+
+      # Mailtrap
+      MAILTRAP_USERNAME: ${MAILTRAP_USERNAME}
+      MAILTRAP_PASSWORD: ${MAILTRAP_PASSWORD}
+
+      # Twilio
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
 
     ports:
       - "9000:9000"
+    networks:
+      - cms-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9000/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-    depends_on:
-      - db
+volumes:
+  postgres_data:
+
+networks:
+  cms-network:
+    driver: bridge

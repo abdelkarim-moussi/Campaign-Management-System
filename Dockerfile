@@ -1,5 +1,10 @@
-FROM eclipse-temurin:17-jdk
+
+FROM eclipse-temurin:17-jdk-alpine AS build
+
 WORKDIR /app
-COPY target/campaign-cms.jar /app/campaign-cms.jar
+
+COPY target/*.jar app.jar
+
 EXPOSE 9000
-CMD ["java", "-jar", "your-app.jar"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
