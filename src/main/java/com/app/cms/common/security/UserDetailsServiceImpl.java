@@ -1,6 +1,7 @@
 package com.app.cms.common.security;
 
-import com.app.cms.common.exception.UserNotFoundException;
+import com.app.cms.user.entity.User;
+import com.app.cms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,9 +15,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByEmail(email).orElseThrow(
-                () -> new UserNotFoundException("user not found with email : "+email)
-        );
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UsernameNotFoundException("User not found with email: " + email));
 
         return new UserDetailsImpl(user);
     }

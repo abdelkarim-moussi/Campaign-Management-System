@@ -1,6 +1,6 @@
 package com.app.cms.contact;
 
-import com.app.cms.contact.domain.ContactStatus;
+import com.app.cms.contact.entity.ContactStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -9,6 +9,7 @@ import java.util.Set;
 
 @Data
 public class ContactDto {
+    
     @NotBlank(message = "First name is required")
     private String firstName;
 

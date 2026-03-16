@@ -3,31 +3,45 @@ spring:
     name: campaign-management-system
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${POSTGRES_DATASOURCE_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5433/myDb?createDatabaseIfNotExist=true}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:root}
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          google:
-#            client-id: "187816912816-v277qohuj5539p02dh4l7ue2fglnbs7o.apps.googleusercontent.com"
-#            client-secret: "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"
-#            scope:
-#              - profile
-#              - email
-#            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-#            authorization-grant-type: authorization_code
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:client_id.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET:"Google_client_secret"}
+            scope:
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: ${MAILTRAP_USERNAME:your-mailtrap-username}
+    password: ${MAILTRAP_PASSWORD:your-mailtrap-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        transport:
+          protocol: smtp
 
 springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
-    url: /api-docs
+    uri: /api-docs
     operations-sorter: method
 
 logging:
@@ -40,11 +54,41 @@ logging:
 
 security:
   jwt:
-    secret-key: ${JWT_SECRET_KEY}
-    expiration-time: 3600000
+    secret-key: ${JWT_SECRET_KEY:custom_jwt_secret_key}
+    expiration-time: 900000
 
     refresh-token:
-      expiration-time: 360000000
+      expiration-time: 604800000
 
 server:
   port: 9000
+
+
+cms:
+  email:
+#    provider: postmark
+#    api-key: ${POSTMARK_SERVER_TOKEN:your-postmark-server-token}
+#    from-email: ${FROM_EMAIL:noreply@votredomain.com}
+#    from-name: CMS Platform
+
+#    provider: smtp
+#    smtp-host: smtp.gmail.com
+#    smtp-port: 587
+#    smtp-username: ${SMTP_USERNAME:your-email@gmail.com}
+#    smtp-password: ${SMTP_PASSWORD:your-app-password}
+#    smtp-use-tls: true
+
+    provider: smtp
+    smtp-host: smtp.mailtrap.io
+    smtp-port: 2525
+    smtp-username: ${MAILTRAP_USERNAME:your-username}
+    smtp-password: ${MAILTRAP_PASSWORD:your-password}
+    smtp-use-tls: true
+    from-email: test@cms.com
+    from-name: CMS Test
+
+  sms:
+    provider: twilio
+    account-sid: ${TWILIO_ACCOUNT_SID:your-account-sid}
+    auth-token: ${TWILIO_AUTH_TOKEN:your-auth-token}
+    from-number: ${TWILIO_FROM_NUMBER:+1234567890}
