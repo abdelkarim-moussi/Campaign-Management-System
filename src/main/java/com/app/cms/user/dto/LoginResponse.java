@@ -10,6 +10,8 @@ import java.util.Map;
 public class LoginResponse {
     private Map<String,String> tokens;
     private String type = "Bearer";
+    private Long expiresIn;
+    private Long setRefreshExpiresIn;
     private UserDto user;
     private OrganizationDto organization;
 

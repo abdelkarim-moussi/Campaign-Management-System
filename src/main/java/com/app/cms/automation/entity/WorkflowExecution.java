@@ -1,7 +1,7 @@
 package com.app.cms.automation.entity;
 
 
-import com.app.cms.contact.Contact;
+import com.app.cms.contact.entity.Contact;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

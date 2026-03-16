@@ -7,4 +7,5 @@ public interface AuthService {
     LoginResponse login(LoginRequest request);
     LoginResponse acceptInvitation(AcceptInvitationRequest request);
     UserDto getCurrentUser();
+    RefreshTokenResponse refreshToken(RefreshTokenRequest request);
 }

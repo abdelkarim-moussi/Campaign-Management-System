@@ -52,9 +52,30 @@ public class JwtService {
         return extractClaim(token, claims -> claims.get("type", String.class));
     }
 
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
+    public Long extractOrganizationId(String token) {
+        return extractClaim(token, claims -> claims.get("organizationId", Long.class));
+    }
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+
     public String generateAccessToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "ACCESS");
+
+        if (userDetails instanceof UserDetailsImpl userDetailsImpl) {
+            User user = userDetailsImpl.getUser();
+            claims.put("userId", user.getId());
+            claims.put("organizationId", user.getOrganization().getId());
+            claims.put("role", user.getRole().toString());
+            claims.put("firstName", user.getFirstName());
+            claims.put("lastName", user.getLastName());
+        }
 
         Set<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -75,6 +96,12 @@ public class JwtService {
     public String generateRefreshToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "REFRESH");
+
+        if (userDetails instanceof UserDetailsImpl userDetailsImpl) {
+            User user = userDetailsImpl.getUser();
+            claims.put("userId", user.getId());
+        }
+
         String activeKey = ACTIVE + userDetails.getUsername();
         return buildToken(claims, userDetails.getUsername(), refreshTokenExpirationTime);
     }
@@ -139,5 +166,9 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
 
+    }
+
+    public Long getAccessTokenExpirationTime() {
+        return accessTokenExpirationTime / 1000;
     }
 }

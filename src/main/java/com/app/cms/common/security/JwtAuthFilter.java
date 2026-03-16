@@ -48,8 +48,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
 
                     UserDetailsImpl details = (UserDetailsImpl) userDetails;
-                    OrganizationContext.setOrganizationId(details.getOrganizationId());
-                    OrganizationContext.setUserId(details.getUserId());
+                    OrganizationContext.setOrganizationId(details.getUser().getOrganization().getId());
+                    OrganizationContext.setUserId(details.getUser().getId());
                 }
             }
 
