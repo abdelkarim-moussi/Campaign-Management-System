@@ -1,0 +1,25 @@
+name: CI
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout
+
+      - name: Set Up JDK
+        uses: actions/setup-java
+        with:
+          java-version: '17'
+          distribution: 'temurine'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven
+
+      - name: Build With Maven
+        uses: mvn --batche-mode clean install
