@@ -4,7 +4,7 @@ on:
     branches: [main]
 
 env:
-  DOCKE_IMAGE_NAME: abdelkarim/cms-api
+  DOCKE_IMAGE_NAME: ${{secrets.DOCKERHUB_USERNAME}}/cms-api
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
@@ -35,4 +35,4 @@ jobs:
         with:
           context: .
           push: 'true'
-          tags: cms-api:latest, cms-api:${{ github.sha }}
+          tags: ${{env.DOCKE_IMAGE_NAME}}:latest, ${{env.DOCKE_IMAGE_NAME}}:${{ github.sha }}
