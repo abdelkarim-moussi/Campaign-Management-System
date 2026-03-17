@@ -3,25 +3,13 @@ spring:
     name: campaign-management-system
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5433/myDb?createDatabaseIfNotExist=true}
+    url: ${POSTGRES_DATASOURCE_URL:jdbc:postgresql://localhost:5433/cms_db?createDatabaseIfNotExist=true}
     username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:root}
+    password: ${POSTGRES_PASSWORD:postgres}
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${GOOGLE_CLIENT_ID:client_id.apps.googleusercontent.com}
-            client-secret: ${GOOGLE_CLIENT_SECRET:"Google_client_secret"}
-            scope:
-              - profile
-              - email
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            authorization-grant-type: authorization_code
 
   mail:
     host: sandbox.smtp.mailtrap.io

@@ -1,7 +1,7 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres
     container_name: cms-postgres
     environment:
       POSTGRES_DB: cms_db
