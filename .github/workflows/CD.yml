@@ -35,4 +35,4 @@ jobs:
         with:
           context: .
           push: 'true'
-          tags: CMS-API:latest, CMS-API:${{ github.sha }}
+          tags: cms-api:latest, cms-api:${{ github.sha }}
