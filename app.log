@@ -512,3 +512,4 @@ Caused by: org.hibernate.HibernateException: Unable to determine Dialect without
 	... 109 common frames omitted
 
 2026-03-17T00:26:26.482Z  WARN 28196 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-17T13:51:16.683Z  WARN 14132 --- [campaign-management-system] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
