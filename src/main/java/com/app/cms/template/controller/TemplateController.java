@@ -8,6 +8,8 @@ import com.app.cms.template.entity.TemplateType;
 import com.app.cms.template.service.TemplateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,24 +35,22 @@ public class TemplateController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Template>> getAllTemplates(
+    public ResponseEntity<Page<Template>> getAllTemplates(
             @RequestParam(required = false) TemplateType type,
-            @RequestParam(required = false) TemplateStatus status){
+            @RequestParam(required = false) TemplateStatus status,
+            Pageable pageable){
 
         if(type != null && status != null){
             return ResponseEntity.ok(
-                    templateService.getTemplatesByStatus(status)
-                            .stream()
-                            .filter(t -> t.getType().equals(type))
-                            .toList()
+                    templateService.getTemplatesByStatus(status, pageable)
             );
         }else if(type != null){
-            return ResponseEntity.ok(templateService.getTemplatesByType(type));
+            return ResponseEntity.ok(templateService.getTemplatesByType(type, pageable));
         }else if(status != null){
-            return ResponseEntity.ok(templateService.getTemplatesByStatus(status));
+            return ResponseEntity.ok(templateService.getTemplatesByStatus(status, pageable));
         }
 
-        return ResponseEntity.ok(templateService.getAllTemplates());
+        return ResponseEntity.ok(templateService.getAllTemplates(pageable));
     }
 
     @PatchMapping("/{id}")
@@ -66,11 +66,11 @@ public class TemplateController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<Template>> getActiveTemplates(@RequestParam(required = false) TemplateType type){
+    public ResponseEntity<Page<Template>> getActiveTemplates(@RequestParam(required = false) TemplateType type, Pageable pageable){
         if(type != null){
-            return ResponseEntity.ok(templateService.getActiveTemplatesByType(type));
+            return ResponseEntity.ok(templateService.getActiveTemplatesByType(type, pageable));
         }
-        return ResponseEntity.ok(templateService.getActiveTemplates());
+        return ResponseEntity.ok(templateService.getActiveTemplates(pageable));
     }
 
     @GetMapping("/{id}/variables")
@@ -95,8 +95,8 @@ public class TemplateController {
     }
 
     @GetMapping("/search/{keyword}")
-    public ResponseEntity<List<Template>> searchTemplates(@PathVariable String keyword){
-        return ResponseEntity.ok(templateService.searchTemplates(keyword));
+    public ResponseEntity<Page<Template>> searchTemplates(@PathVariable String keyword, Pageable pageable){
+        return ResponseEntity.ok(templateService.searchTemplates(keyword, pageable));
     }
 
     @GetMapping("/{id}/preview")

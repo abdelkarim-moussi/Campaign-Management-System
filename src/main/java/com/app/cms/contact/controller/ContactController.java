@@ -6,6 +6,8 @@ import com.app.cms.contact.entity.Contact;
 import com.app.cms.contact.entity.ContactStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +34,8 @@ public class ContactController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Contact>> getAllContacts() {
-        return ResponseEntity.ok(contactService.getAllContacts());
+    public ResponseEntity<Page<Contact>> getAllContacts(Pageable pageable) {
+        return ResponseEntity.ok(contactService.getAllContacts(pageable));
     }
 
     @GetMapping("/{id}")
@@ -42,13 +44,13 @@ public class ContactController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Contact>> searchContacts(@RequestParam String keyword) {
-        return ResponseEntity.ok(contactService.searchContacts(keyword));
+    public ResponseEntity<Page<Contact>> searchContacts(@RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok(contactService.searchContacts(keyword, pageable));
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Contact>> getContactsByStatus(@PathVariable ContactStatus status) {
-        return ResponseEntity.ok(contactService.getContactsByStatus(status));
+    public ResponseEntity<Page<Contact>> getContactsByStatus(@PathVariable ContactStatus status, Pageable pageable) {
+        return ResponseEntity.ok(contactService.getContactsByStatus(status, pageable));
     }
 
     @PatchMapping("/{id}")

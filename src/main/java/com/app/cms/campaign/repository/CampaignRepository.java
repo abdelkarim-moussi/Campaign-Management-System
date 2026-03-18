@@ -3,6 +3,8 @@ package com.app.cms.campaign.repository;
 import com.app.cms.campaign.entity.CampaignStatus;
 import com.app.cms.campaign.entity.Campaign;
 import com.app.cms.campaign.entity.CampaignChannel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,7 +18,11 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
 
     List<Campaign> findAllByOrganizationId(Long orgId);
 
+    Page<Campaign> findAllByOrganizationId(Long orgId, Pageable pageable);
+
     List<Campaign> findByStatusAndOrganizationId(CampaignStatus status, Long orgId);
+
+    Page<Campaign> findByStatusAndOrganizationId(CampaignStatus status, Long orgId, Pageable pageable);
 
     List<Campaign> findByChannelAndOrganizationId(CampaignChannel channel, Long orgId);
 
@@ -33,6 +39,12 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
             "OR LOWER(c.description) LIKE LOWER(CONCAT('%',:keyword,'%') ) " +
             "AND c.organizationId = :orgId")
     List<Campaign> searchCampaignsByOrganizationId(String keyword, Long orgId);
+
+    @Query("SELECT c FROM Campaign c WHERE " +
+            "LOWER(c.name) LIKE LOWER(CONCAT('%',:keyword,'%')) " +
+            "OR LOWER(c.description) LIKE LOWER(CONCAT('%',:keyword,'%') ) " +
+            "AND c.organizationId = :orgId")
+    Page<Campaign> searchCampaignsByOrganizationId(String keyword, Long orgId, Pageable pageable);
 
     boolean existsByNameAndOrganizationId(String name, Long orgId);
 

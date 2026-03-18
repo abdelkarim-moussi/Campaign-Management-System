@@ -8,10 +8,11 @@ import com.app.cms.automation.entity.WorkflowLog;
 import com.app.cms.automation.service.WorkflowService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/automation/workflows")
@@ -32,13 +33,13 @@ public class WorkflowController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Workflow>> getAllWorkflows() {
-        return ResponseEntity.ok(workflowService.getAllWorkflows());
+    public ResponseEntity<Page<Workflow>> getAllWorkflows(Pageable pageable) {
+        return ResponseEntity.ok(workflowService.getAllWorkflows(pageable));
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<Workflow>> getActiveWorkflows() {
-        return ResponseEntity.ok(workflowService.getActiveWorkflows());
+    public ResponseEntity<Page<Workflow>> getActiveWorkflows(Pageable pageable) {
+        return ResponseEntity.ok(workflowService.getActiveWorkflows(pageable));
     }
 
     @GetMapping("/{id}")
@@ -63,13 +64,13 @@ public class WorkflowController {
     }
 
     @GetMapping("/{id}/executions")
-    public ResponseEntity<List<WorkflowExecution>> getWorkflowExecutions(@PathVariable Long id) {
-        return ResponseEntity.ok(workflowService.getWorkflowExecutions(id));
+    public ResponseEntity<Page<WorkflowExecution>> getWorkflowExecutions(@PathVariable Long id, Pageable pageable) {
+        return ResponseEntity.ok(workflowService.getWorkflowExecutions(id, pageable));
     }
 
     @GetMapping("/executions/{executionId}/logs")
-    public ResponseEntity<List<WorkflowLog>> getExecutionLogs(@PathVariable Long executionId) {
-        return ResponseEntity.ok(workflowService.getExecutionLogs(executionId));
+    public ResponseEntity<Page<WorkflowLog>> getExecutionLogs(@PathVariable Long executionId, Pageable pageable) {
+        return ResponseEntity.ok(workflowService.getExecutionLogs(executionId, pageable));
     }
 
     @GetMapping("/{id}/stats")

@@ -2,6 +2,8 @@ package com.app.cms.automation.repository;
 
 import com.app.cms.automation.entity.ExecutionStatus;
 import com.app.cms.automation.entity.WorkflowExecution;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,6 +14,8 @@ public interface WorkflowExecutionRepository extends JpaRepository<WorkflowExecu
     List<WorkflowExecution> findByOrganizationId(Long organizationId);
 
     List<WorkflowExecution> findByWorkflowId(Long workflowId);
+
+    Page<WorkflowExecution> findByWorkflowId(Long workflowId, Pageable pageable);
 
     List<WorkflowExecution> findByContactId(Long contactId);
 

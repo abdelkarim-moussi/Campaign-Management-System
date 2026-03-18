@@ -17,6 +17,8 @@ import com.app.cms.common.security.OrganizationContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -163,10 +165,22 @@ public class ChannelServiceImpl implements ChannelService {
         return messageSentRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId);
     }
 
+    public Page<MessageSent> getMessagesByCampaign(Long campaignId, Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return messageSentRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId, pageable);
+    }
+
     public List<MessageSent> getMessagesByContact(Long contactId) {
         Long organizationId = OrganizationContext.getOrganizationId();
 
         return messageSentRepository.findByContactIdAndOrganizationId(contactId, organizationId);
+    }
+
+    public Page<MessageSent> getMessagesByContact(Long contactId, Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return messageSentRepository.findByContactIdAndOrganizationId(contactId, organizationId, pageable);
     }
 
     @Transactional

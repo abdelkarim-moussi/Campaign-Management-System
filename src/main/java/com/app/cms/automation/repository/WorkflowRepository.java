@@ -3,6 +3,8 @@ package com.app.cms.automation.repository;
 import com.app.cms.automation.entity.Workflow;
 import com.app.cms.automation.entity.WorkflowStatus;
 import com.app.cms.automation.entity.WorkflowTriggerType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,9 +14,13 @@ import java.util.Optional;
 public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
     List<Workflow> findByOrganizationId(Long organizationId);
 
+    Page<Workflow> findByOrganizationId(Long organizationId, Pageable pageable);
+
     Optional<Workflow> findByIdAndOrganizationId(Long id, Long organizationId);
 
     List<Workflow> findByOrganizationIdAndStatus(Long organizationId, WorkflowStatus status);
+
+    Page<Workflow> findByOrganizationIdAndStatus(Long organizationId, WorkflowStatus status, Pageable pageable);
 
     List<Workflow> findByOrganizationIdAndTriggerType(Long organizationId, WorkflowTriggerType triggerType);
 

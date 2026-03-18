@@ -13,6 +13,8 @@ import com.app.cms.contact.repository.ContactRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,15 +110,33 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    public Page<Contact> getAllContacts(Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return contactRepository.findAllByOrganization(organizationId, pageable);
+    }
+
+    @Override
     public List<Contact> getContactsByStatus(ContactStatus status) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return contactRepository.findByStatusAndOrganization(status, organizationId);
     }
 
     @Override
+    public Page<Contact> getContactsByStatus(ContactStatus status, Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return contactRepository.findByStatusAndOrganization(status, organizationId, pageable);
+    }
+
+    @Override
     public List<Contact> searchContacts(String keyword) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return contactRepository.searchContactsByOrganization(keyword, organizationId);
+    }
+
+    @Override
+    public Page<Contact> searchContacts(String keyword, Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return contactRepository.searchContactsByOrganization(keyword, organizationId, pageable);
     }
 
     @Transactional

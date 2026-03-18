@@ -8,6 +8,8 @@ import com.app.cms.campaign.entity.CampaignStatus;
 import com.app.cms.campaign.service.CampaignService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +30,15 @@ public class CampaignController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Campaign>> getAllCampaigns(
-            @RequestParam(required = false) CampaignStatus status) {
+    public ResponseEntity<Page<Campaign>> getAllCampaigns(
+            @RequestParam(required = false) CampaignStatus status,
+            Pageable pageable) {
 
         if (status != null) {
-            return ResponseEntity.ok(campaignService.getCampaignsByStatus(status));
+            return ResponseEntity.ok(campaignService.getCampaignsByStatus(status, pageable));
         }
 
-        return ResponseEntity.ok(campaignService.getAllCampaigns());
+        return ResponseEntity.ok(campaignService.getAllCampaigns(pageable));
     }
 
     @GetMapping("/{id}")
@@ -49,13 +52,13 @@ public class CampaignController {
     }
 
     @GetMapping("/{id}/contacts")
-    public ResponseEntity<List<CampaignContact>> getCampaignContacts(@PathVariable Long id) {
-        return ResponseEntity.ok(campaignService.getCampaignContacts(id));
+    public ResponseEntity<Page<CampaignContact>> getCampaignContacts(@PathVariable Long id, Pageable pageable) {
+        return ResponseEntity.ok(campaignService.getCampaignContacts(id, pageable));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Campaign>> searchCampaigns(@RequestParam String keyword) {
-        return ResponseEntity.ok(campaignService.searchCampaigns(keyword));
+    public ResponseEntity<Page<Campaign>> searchCampaigns(@RequestParam String keyword, Pageable pageable) {
+        return ResponseEntity.ok(campaignService.searchCampaigns(keyword, pageable));
     }
 
     @PutMapping("/{id}")

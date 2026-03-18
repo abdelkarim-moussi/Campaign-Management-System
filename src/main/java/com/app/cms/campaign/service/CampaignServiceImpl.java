@@ -24,6 +24,8 @@ import com.app.cms.template.service.TemplateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,6 +135,14 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
+    public Page<Campaign> getAllCampaigns(Pageable pageable) {
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignRepository.findAllByOrganizationId(organizationId, pageable);
+    }
+
+    @Override
     public List<Campaign> getCampaignsByStatus(CampaignStatus status) {
 
         Long organizationId = OrganizationContext.getOrganizationId();
@@ -141,11 +151,27 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
+    public Page<Campaign> getCampaignsByStatus(CampaignStatus status, Pageable pageable) {
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignRepository.findByStatusAndOrganizationId(status, organizationId, pageable);
+    }
+
+    @Override
     public List<Campaign> searchCampaigns(String keyword) {
 
         Long organizationId = OrganizationContext.getOrganizationId();
 
         return campaignRepository.searchCampaignsByOrganizationId(keyword, organizationId);
+    }
+
+    @Override
+    public Page<Campaign> searchCampaigns(String keyword, Pageable pageable) {
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignRepository.searchCampaignsByOrganizationId(keyword, organizationId, pageable);
     }
 
     @Override
@@ -380,5 +406,13 @@ public class CampaignServiceImpl implements CampaignService {
         Long organizationId = OrganizationContext.getOrganizationId();
 
         return campaignContactRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId);
+    }
+
+    @Override
+    public Page<CampaignContact> getCampaignContacts(Long campaignId, Pageable pageable) {
+
+        Long organizationId = OrganizationContext.getOrganizationId();
+
+        return campaignContactRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId, pageable);
     }
 }

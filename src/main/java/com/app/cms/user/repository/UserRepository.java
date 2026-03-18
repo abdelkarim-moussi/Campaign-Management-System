@@ -3,6 +3,8 @@ package com.app.cms.user.repository;
 import com.app.cms.user.entity.User;
 import com.app.cms.user.entity.UserRole;
 import com.app.cms.user.entity.UserStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,6 +17,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
     boolean existsByEmail(String email);
 
     List<User> findByOrganizationId(Long organizationId);
+
+    Page<User> findByOrganizationId(Long organizationId, Pageable pageable);
 
     List<User> findByOrganizationIdAndStatus(Long organizationId, UserStatus status);
 

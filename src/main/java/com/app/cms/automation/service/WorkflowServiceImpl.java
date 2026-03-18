@@ -19,6 +19,8 @@ import com.app.cms.contact.event.ContactCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,9 +115,19 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflowRepository.findByOrganizationId(organizationId);
     }
 
+    public Page<Workflow> getAllWorkflows(Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return workflowRepository.findByOrganizationId(organizationId, pageable);
+    }
+
     public List<Workflow> getActiveWorkflows() {
         Long organizationId = OrganizationContext.getOrganizationId();
         return workflowRepository.findByOrganizationIdAndStatus(organizationId,WorkflowStatus.ACTIVE);
+    }
+
+    public Page<Workflow> getActiveWorkflows(Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return workflowRepository.findByOrganizationIdAndStatus(organizationId, WorkflowStatus.ACTIVE, pageable);
     }
 
 
@@ -153,8 +165,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         return executionRepository.findByWorkflowId(workflowId);
     }
 
+    public Page<WorkflowExecution> getWorkflowExecutions(Long workflowId, Pageable pageable) {
+        getWorkflow(workflowId);
+        return executionRepository.findByWorkflowId(workflowId, pageable);
+    }
+
     public List<WorkflowLog> getExecutionLogs(Long executionId) {
         return logRepository.findByExecutionIdOrderByExecutedAtAsc(executionId);
+    }
+
+    public Page<WorkflowLog> getExecutionLogs(Long executionId, Pageable pageable) {
+        return logRepository.findByExecutionIdOrderByExecutedAtAsc(executionId, pageable);
     }
 
 

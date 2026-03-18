@@ -2,6 +2,8 @@ package com.app.cms.campaign.repository;
 
 import com.app.cms.campaign.entity.MessageStatus;
 import com.app.cms.campaign.entity.CampaignContact;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,6 +12,8 @@ import java.util.List;
 public interface CampaignContactRepository extends JpaRepository<CampaignContact, Long> {
 
     List<CampaignContact> findByCampaignIdAndOrganizationId(Long campaignId,Long orgId);
+
+    Page<CampaignContact> findByCampaignIdAndOrganizationId(Long campaignId, Long orgId, Pageable pageable);
 
     List<CampaignContact> findByContactIdAndOrganizationId(Long contactId,Long orgId);
 

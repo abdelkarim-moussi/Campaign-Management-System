@@ -14,6 +14,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,9 +80,19 @@ public class TemplateServiceImpl implements TemplateService {
         return templateRepository.findAllByOrganizationId(organizationId);
     }
 
+    public Page<Template> getAllTemplates(Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findAllByOrganizationId(organizationId, pageable);
+    }
+
     public List<Template> getTemplatesByType(TemplateType type) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return templateRepository.findByTypeAndOrganizationId(type, organizationId);
+    }
+
+    public Page<Template> getTemplatesByType(TemplateType type, Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findByTypeAndOrganizationId(type, organizationId, pageable);
     }
 
     public List<Template> getTemplatesByStatus(TemplateStatus status) {
@@ -88,9 +100,19 @@ public class TemplateServiceImpl implements TemplateService {
         return templateRepository.findByStatusAndOrganizationId(status, organizationId);
     }
 
+    public Page<Template> getTemplatesByStatus(TemplateStatus status, Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findByStatusAndOrganizationId(status, organizationId, pageable);
+    }
+
     public List<Template> getActiveTemplates() {
         Long organizationId = OrganizationContext.getOrganizationId();
         return templateRepository.findActiveTemplatesByOrganization(organizationId);
+    }
+
+    public Page<Template> getActiveTemplates(Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findActiveTemplatesByOrganization(organizationId, pageable);
     }
 
     public List<Template> getActiveTemplatesByType(TemplateType type) {
@@ -98,9 +120,19 @@ public class TemplateServiceImpl implements TemplateService {
         return templateRepository.findActiveTemplatesByTypeAndOrganization(type, organizationId);
     }
 
+    public Page<Template> getActiveTemplatesByType(TemplateType type, Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.findActiveTemplatesByTypeAndOrganization(type, organizationId, pageable);
+    }
+
     public List<Template> searchTemplates(String keyword) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return templateRepository.searchTemplatesByOrganization(keyword, organizationId);
+    }
+
+    public Page<Template> searchTemplates(String keyword, Pageable pageable) {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return templateRepository.searchTemplatesByOrganization(keyword, organizationId, pageable);
     }
 
     @Transactional

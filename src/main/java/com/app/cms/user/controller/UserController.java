@@ -8,6 +8,8 @@ import com.app.cms.user.entity.UserRole;
 import com.app.cms.user.sevice.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,8 +33,8 @@ public class UserController {
 
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getOrganizationUsers() {
-        List<UserDto> users = userService.getOrganizationUsers();
+    public ResponseEntity<Page<UserDto>> getOrganizationUsers(Pageable pageable) {
+        Page<UserDto> users = userService.getOrganizationUsers(pageable);
         return ResponseEntity.ok(users);
     }
 
