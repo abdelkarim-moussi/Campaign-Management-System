@@ -40,6 +40,9 @@ public class Contact {
     private String company;
 
     @Enumerated(EnumType.STRING)
+    private ContactGroup group = ContactGroup.GENERAL;
+
+    @Enumerated(EnumType.STRING)
     private ContactStatus status = ContactStatus.LEAD;
 
     @ManyToMany
