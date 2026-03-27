@@ -65,7 +65,6 @@ public class Contact {
         updatedAt = LocalDateTime.now();
     }
 
-    // Helper methods
     public String getFullName() {
         return firstName + " " + lastName;
     }

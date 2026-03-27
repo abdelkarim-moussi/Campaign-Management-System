@@ -110,19 +110,9 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .orElseThrow(() -> new RuntimeException("Workflow not found: " + id));
     }
 
-    public List<Workflow> getAllWorkflows() {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return workflowRepository.findByOrganizationId(organizationId);
-    }
-
     public Page<Workflow> getAllWorkflows(Pageable pageable) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return workflowRepository.findByOrganizationId(organizationId, pageable);
-    }
-
-    public List<Workflow> getActiveWorkflows() {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return workflowRepository.findByOrganizationIdAndStatus(organizationId,WorkflowStatus.ACTIVE);
     }
 
     public Page<Workflow> getActiveWorkflows(Pageable pageable) {
@@ -160,18 +150,9 @@ public class WorkflowServiceImpl implements WorkflowService {
         log.info("Workflow '{}' deleted", workflow.getName());
     }
 
-    public List<WorkflowExecution> getWorkflowExecutions(Long workflowId) {
-        getWorkflow(workflowId);
-        return executionRepository.findByWorkflowId(workflowId);
-    }
-
     public Page<WorkflowExecution> getWorkflowExecutions(Long workflowId, Pageable pageable) {
         getWorkflow(workflowId);
         return executionRepository.findByWorkflowId(workflowId, pageable);
-    }
-
-    public List<WorkflowLog> getExecutionLogs(Long executionId) {
-        return logRepository.findByExecutionIdOrderByExecutedAtAsc(executionId);
     }
 
     public Page<WorkflowLog> getExecutionLogs(Long executionId, Pageable pageable) {

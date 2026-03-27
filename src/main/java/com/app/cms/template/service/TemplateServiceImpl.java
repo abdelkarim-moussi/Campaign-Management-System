@@ -75,19 +75,9 @@ public class TemplateServiceImpl implements TemplateService {
                 .orElseThrow(() -> new TemplateNotFoundException("No Template Found With Id: " + id));
     }
 
-    public List<Template> getAllTemplates() {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findAllByOrganizationId(organizationId);
-    }
-
     public Page<Template> getAllTemplates(Pageable pageable) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return templateRepository.findAllByOrganizationId(organizationId, pageable);
-    }
-
-    public List<Template> getTemplatesByType(TemplateType type) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findByTypeAndOrganizationId(type, organizationId);
     }
 
     public Page<Template> getTemplatesByType(TemplateType type, Pageable pageable) {
@@ -95,19 +85,9 @@ public class TemplateServiceImpl implements TemplateService {
         return templateRepository.findByTypeAndOrganizationId(type, organizationId, pageable);
     }
 
-    public List<Template> getTemplatesByStatus(TemplateStatus status) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findByStatusAndOrganizationId(status, organizationId);
-    }
-
     public Page<Template> getTemplatesByStatus(TemplateStatus status, Pageable pageable) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return templateRepository.findByStatusAndOrganizationId(status, organizationId, pageable);
-    }
-
-    public List<Template> getActiveTemplates() {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findActiveTemplatesByOrganization(organizationId);
     }
 
     public Page<Template> getActiveTemplates(Pageable pageable) {
@@ -115,19 +95,9 @@ public class TemplateServiceImpl implements TemplateService {
         return templateRepository.findActiveTemplatesByOrganization(organizationId, pageable);
     }
 
-    public List<Template> getActiveTemplatesByType(TemplateType type) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.findActiveTemplatesByTypeAndOrganization(type, organizationId);
-    }
-
     public Page<Template> getActiveTemplatesByType(TemplateType type, Pageable pageable) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return templateRepository.findActiveTemplatesByTypeAndOrganization(type, organizationId, pageable);
-    }
-
-    public List<Template> searchTemplates(String keyword) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return templateRepository.searchTemplatesByOrganization(keyword, organizationId);
     }
 
     public Page<Template> searchTemplates(String keyword, Pageable pageable) {

@@ -128,45 +128,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         }
     }
 
-    private void updateStats(MessageSentEvent event, Long organizationId) {
-        CampaignStats stats = campaignStatsRepository
-                .findByCampaignIdAndOrganizationId(event.campaignId(), organizationId)
-                .orElseGet(() -> {
-                    CampaignStats newStats = new CampaignStats();
-                    newStats.setCampaignId(event.campaignId());
-                    newStats.setOrganizationId(organizationId);
-                    return newStats;
-                });
 
-        if (event.success()) {
-            stats.setTotalSent(stats.getTotalSent() + 1);
-            stats.setTotalDelivered(stats.getTotalDelivered() + 1);
-
-            MessageTracking tracking = new MessageTracking();
-            tracking.setOrganizationId(organizationId);
-            tracking.setMessageId(event.messageId());
-            tracking.setCampaignId(event.campaignId());
-            tracking.setContactId(event.contactId());
-            tracking.setEventType(TrackingEventType.SENT);
-            tracking.setEventAt(event.sentAt());
-            messageTrackingRepository.save(tracking);
-
-            MessageTracking deliveryTracking = new MessageTracking();
-            deliveryTracking.setOrganizationId(organizationId);
-            deliveryTracking.setMessageId(event.messageId());
-            deliveryTracking.setCampaignId(event.campaignId());
-            deliveryTracking.setContactId(event.contactId());
-            deliveryTracking.setEventType(TrackingEventType.DELIVERED);
-            deliveryTracking.setEventAt(event.sentAt());
-            messageTrackingRepository.save(deliveryTracking);
-
-        } else {
-            stats.setTotalFailed(stats.getTotalFailed() + 1);
-        }
-
-        stats.calculateRates();
-        campaignStatsRepository.save(stats);
-    }
 
     @Transactional
     public void trackEvent(Long messageId, Long campaignId, Long contactId,

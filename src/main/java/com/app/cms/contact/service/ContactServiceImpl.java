@@ -104,33 +104,15 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public List<Contact> getAllContacts() {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return contactRepository.findAllByOrganization(organizationId);
-    }
-
-    @Override
     public Page<Contact> getAllContacts(Pageable pageable) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return contactRepository.findAllByOrganization(organizationId, pageable);
     }
 
     @Override
-    public List<Contact> getContactsByStatus(ContactStatus status) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return contactRepository.findByStatusAndOrganization(status, organizationId);
-    }
-
-    @Override
     public Page<Contact> getContactsByStatus(ContactStatus status, Pageable pageable) {
         Long organizationId = OrganizationContext.getOrganizationId();
         return contactRepository.findByStatusAndOrganization(status, organizationId, pageable);
-    }
-
-    @Override
-    public List<Contact> searchContacts(String keyword) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-        return contactRepository.searchContactsByOrganization(keyword, organizationId);
     }
 
     @Override

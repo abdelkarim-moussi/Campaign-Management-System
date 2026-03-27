@@ -127,14 +127,6 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<Campaign> getAllCampaigns() {
-
-        Long organizationId = OrganizationContext.getOrganizationId();
-
-        return campaignRepository.findAllByOrganizationId(organizationId);
-    }
-
-    @Override
     public Page<Campaign> getAllCampaigns(Pageable pageable) {
 
         Long organizationId = OrganizationContext.getOrganizationId();
@@ -143,27 +135,11 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public List<Campaign> getCampaignsByStatus(CampaignStatus status) {
-
-        Long organizationId = OrganizationContext.getOrganizationId();
-
-        return campaignRepository.findByStatusAndOrganizationId(status, organizationId);
-    }
-
-    @Override
     public Page<Campaign> getCampaignsByStatus(CampaignStatus status, Pageable pageable) {
 
         Long organizationId = OrganizationContext.getOrganizationId();
 
         return campaignRepository.findByStatusAndOrganizationId(status, organizationId, pageable);
-    }
-
-    @Override
-    public List<Campaign> searchCampaigns(String keyword) {
-
-        Long organizationId = OrganizationContext.getOrganizationId();
-
-        return campaignRepository.searchCampaignsByOrganizationId(keyword, organizationId);
     }
 
     @Override

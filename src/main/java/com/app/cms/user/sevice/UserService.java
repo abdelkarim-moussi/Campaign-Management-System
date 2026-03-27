@@ -8,11 +8,11 @@ import com.app.cms.user.entity.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+
 
 public interface UserService {
     Invitation inviteUser(InviteUserRequest request);
-    List<UserDto> getOrganizationUsers();
+
     Page<UserDto> getOrganizationUsers(Pageable pageable);
     UserDto updateProfile(UpdateProfileRequest request);
     UserDto updateUserRole(Long userId, UserRole newRole);

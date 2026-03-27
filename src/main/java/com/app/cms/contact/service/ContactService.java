@@ -12,11 +12,8 @@ public interface ContactService {
     Contact createContact(ContactDto dto);
     List<Contact> importContacts(List<ContactDto> dtos);
     Contact getContact(Long id);
-    List<Contact> getAllContacts();
     Page<Contact> getAllContacts(Pageable pageable);
-    List<Contact> getContactsByStatus(ContactStatus status);
     Page<Contact> getContactsByStatus(ContactStatus status, Pageable pageable);
-    List<Contact> searchContacts(String keyword);
     Page<Contact> searchContacts(String keyword, Pageable pageable);
     Contact updateContact(Long id, ContactDto dto);
     void deleteContact(Long id);

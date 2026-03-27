@@ -13,11 +13,8 @@ import java.util.List;
 public interface CampaignService {
     Campaign createCampaign(CampaignDto dto);
     Campaign getCampaign(Long id);
-    List<Campaign> getAllCampaigns();
     Page<Campaign> getAllCampaigns(Pageable pageable);
-    List<Campaign> getCampaignsByStatus(CampaignStatus status);
     Page<Campaign> getCampaignsByStatus(CampaignStatus status, Pageable pageable);
-    List<Campaign> searchCampaigns(String keyword);
     Page<Campaign> searchCampaigns(String keyword, Pageable pageable);
     Campaign updateCampaign(Long id, CampaignDto dto);
     void deleteCampaign(Long id);

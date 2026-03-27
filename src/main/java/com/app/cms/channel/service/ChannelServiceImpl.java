@@ -159,22 +159,10 @@ public class ChannelServiceImpl implements ChannelService {
                 .orElseThrow(() -> new RuntimeException("Message not found: " + id));
     }
 
-    public List<MessageSent> getMessagesByCampaign(Long campaignId) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-
-        return messageSentRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId);
-    }
-
     public Page<MessageSent> getMessagesByCampaign(Long campaignId, Pageable pageable) {
         Long organizationId = OrganizationContext.getOrganizationId();
 
         return messageSentRepository.findByCampaignIdAndOrganizationId(campaignId, organizationId, pageable);
-    }
-
-    public List<MessageSent> getMessagesByContact(Long contactId) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-
-        return messageSentRepository.findByContactIdAndOrganizationId(contactId, organizationId);
     }
 
     public Page<MessageSent> getMessagesByContact(Long contactId, Pageable pageable) {
@@ -183,34 +171,4 @@ public class ChannelServiceImpl implements ChannelService {
         return messageSentRepository.findByContactIdAndOrganizationId(contactId, organizationId, pageable);
     }
 
-    @Transactional
-    public void updateMessageStatus(String externalId, MessageStatus newStatus) {
-        Long organizationId = OrganizationContext.getOrganizationId();
-
-        messageSentRepository.findByExternalIdAndOrganizationId(externalId, organizationId).ifPresent(message -> {
-            MessageStatus oldStatus = message.getStatus();
-            message.setStatus(newStatus);
-
-            switch (newStatus) {
-                case SENT:
-                    message.setSentAt(LocalDateTime.now());
-                    break;
-                case DELIVERED:
-                    message.setDeliveredAt(LocalDateTime.now());
-                    break;
-                case OPENED:
-                    message.setOpenedAt(LocalDateTime.now());
-                    break;
-                case CLICKED:
-                    message.setClickedAt(LocalDateTime.now());
-                    break;
-                case FAILED:
-                    message.setErrorMessage("Failed to send message");
-                    break;
-            }
-
-            messageSentRepository.save(message);
-            log.info("Message {} status updated: {} -> {}", externalId, oldStatus, newStatus);
-        });
-    }
 }
