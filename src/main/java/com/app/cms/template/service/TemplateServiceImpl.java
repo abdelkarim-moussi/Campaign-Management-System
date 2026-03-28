@@ -139,6 +139,7 @@ public class TemplateServiceImpl implements TemplateService {
         return templateRepository.save(template);
     }
 
+    @Transactional
     public void deleteTemplate(Long id) {
         log.info("deleting template with id : {}", id);
 

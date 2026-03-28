@@ -28,7 +28,7 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
 
         Page<Template> findByStatusAndOrganizationId(TemplateStatus status, Long orgId, Pageable pageable);
 
-        @Query("SELECT COUNT(t) FROM Template t WHERE t.id=:id AND t.organizationId=:orgId")
+        @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM Template t WHERE t.id=:id AND t.organizationId=:orgId")
         boolean existsByIdAndOrganization(Long id, Long orgId);
 
         List<Template> findByTypeAndStatusAndOrganizationId(TemplateType type, TemplateStatus status, Long orgId);
@@ -66,6 +66,7 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
         Page<Template> findActiveTemplatesByOrganization(Long orgId, Pageable pageable);
 
         @org.springframework.data.jpa.repository.Modifying
+        @org.springframework.transaction.annotation.Transactional
         @Query("DELETE FROM Template t WHERE t.id = :id AND t.organizationId = :orgId")
         void deleteByIdAndOrganizationId(@org.springframework.data.repository.query.Param("id") Long id,
                         @org.springframework.data.repository.query.Param("orgId") Long orgId);

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/automation/workflows")
@@ -43,8 +44,8 @@ public class WorkflowController {
 
     @GetMapping("/active")
     @PreAuthorize("hasAnyRole('OWNER','ADMIN','MEMBER','VIEWER')")
-    public ResponseEntity<Page<Workflow>> getActiveWorkflows(Pageable pageable) {
-        return ResponseEntity.ok(workflowService.getActiveWorkflows(pageable));
+    public ResponseEntity<List<Workflow>> getActiveWorkflows() {
+        return ResponseEntity.ok(workflowService.getActiveWorkflows());
     }
 
     @GetMapping("/{id}")

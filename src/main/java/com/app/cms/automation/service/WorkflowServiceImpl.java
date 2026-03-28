@@ -120,6 +120,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         return workflowRepository.findByOrganizationIdAndStatus(organizationId, WorkflowStatus.ACTIVE, pageable);
     }
 
+    public List<Workflow> getActiveWorkflows() {
+        Long organizationId = OrganizationContext.getOrganizationId();
+        return workflowRepository.findByOrganizationIdAndStatus(organizationId, WorkflowStatus.ACTIVE);
+    }
+
 
     public Workflow activateWorkflow(Long id) {
         Workflow workflow = getWorkflow(id);

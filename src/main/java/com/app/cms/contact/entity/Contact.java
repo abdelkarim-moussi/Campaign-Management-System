@@ -40,6 +40,7 @@ public class Contact {
     private String company;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "contact_group")
     private ContactGroup group = ContactGroup.GENERAL;
 
     @Enumerated(EnumType.STRING)
@@ -52,6 +53,7 @@ public class Contact {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     @ToString.Exclude
+    @Builder.Default
     private Set<Tag> tags = new HashSet<>();
 
     private LocalDateTime createdAt;

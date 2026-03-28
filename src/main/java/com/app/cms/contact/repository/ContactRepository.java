@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface ContactRepository extends JpaRepository<Contact, Long> {
 
-        @Query("SELECT c FROM Contact c WHERE c.id =:id AND c.organizationId=:orgId")
+        @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Contact c WHERE c.id =:id AND c.organizationId=:orgId")
         boolean existsByIdAndOrganization(Long id, Long orgId);
 
         boolean existsByEmail(String email);
@@ -57,6 +57,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
         List<Contact> findByIdInAndOrganization(@Param("ids") List<Long> ids, @Param("orgId") Long orgId);
 
         @org.springframework.data.jpa.repository.Modifying
+        @org.springframework.transaction.annotation.Transactional
         @Query("DELETE FROM Contact c WHERE c.id = :id AND c.organizationId = :orgId")
         void deleteByIdAndOrganizationId(@Param("id") Long id, @Param("orgId") Long orgId);
 
