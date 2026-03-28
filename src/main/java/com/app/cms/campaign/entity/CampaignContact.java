@@ -38,8 +38,6 @@ public class CampaignContact {
     @Column(nullable = false)
     private MessageStatus status = MessageStatus.PENDING;
 
-    private Long messageSentStatus;
-
     private LocalDateTime addedAt;
 
     private LocalDateTime sentAt;

@@ -13,7 +13,7 @@ import lombok.*;
 public class Channel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private Long id;
     @Column(nullable = false)
     private Long organizationId;
     private ChannelType channelType;
