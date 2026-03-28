@@ -21,7 +21,6 @@ public class AnalyticsController {
     private final AnalyticsService analyticsService;
     private final DashboardService dashboardService;
 
-
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardDto> getDashboard() {
         return ResponseEntity.ok(dashboardService.getDashboardStats());
@@ -32,18 +31,15 @@ public class AnalyticsController {
         return ResponseEntity.ok(analyticsService.getCampaignStats(campaignId));
     }
 
-
     @GetMapping("/campaigns")
     public ResponseEntity<List<CampaignStats>> getAllCampaignStats() {
         return ResponseEntity.ok(analyticsService.getAllCampaignStats());
     }
 
-
     @GetMapping("/campaigns/top-performing")
     public ResponseEntity<List<CampaignStats>> getTopPerformingCampaigns() {
         return ResponseEntity.ok(analyticsService.getTopPerformingCampaigns());
     }
-
 
     @GetMapping("/campaigns/{campaignId}/metrics")
     public ResponseEntity<List<PerformanceMetrics>> getPerformanceMetrics(@PathVariable Long campaignId) {
@@ -55,12 +51,10 @@ public class AnalyticsController {
         return ResponseEntity.ok(analyticsService.getMessageTracking(messageId));
     }
 
-
     @GetMapping("/campaigns/{campaignId}/tracking")
     public ResponseEntity<List<MessageTracking>> getCampaignTracking(@PathVariable Long campaignId) {
         return ResponseEntity.ok(analyticsService.getCampaignTracking(campaignId));
     }
-
 
     @PostMapping("/track")
     public ResponseEntity<Void> trackEvent(
