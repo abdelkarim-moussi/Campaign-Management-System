@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "campaign_channels")
+@Table(name = "channels")
 @Getter
 @Setter
 @AllArgsConstructor
