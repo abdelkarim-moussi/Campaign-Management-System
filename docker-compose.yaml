@@ -1,7 +1,6 @@
 services:
-  # PostgreSQL Database
   postgres:
-    image: postgres
+    image: postgres:15
     container_name: cms-postgres
     environment:
       POSTGRES_DB: cms_db
@@ -19,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Spring Boot Application
+
   app:
     build:
       context: .
