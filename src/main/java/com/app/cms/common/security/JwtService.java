@@ -36,9 +36,6 @@ public class JwtService {
     @Value("${security.jwt.refresh-token.expiration-time}")
     private long refreshTokenExpirationTime;
 
-    private final RedisTemplate<String, String> template;
-    private final String ACTIVE = "refresh:active";
-
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -102,7 +99,6 @@ public class JwtService {
             claims.put("userId", user.getId());
         }
 
-        String activeKey = ACTIVE + userDetails.getUsername();
         return buildToken(claims, userDetails.getUsername(), refreshTokenExpirationTime);
     }
 
